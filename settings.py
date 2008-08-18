@@ -1,5 +1,7 @@
 # Django settings for hg project.
 
+PROJECT_NAME = 'hg'
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -70,7 +72,8 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-)
+    "/var/django/"+PROJECT_NAME+"/templates",
+    )
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -90,4 +93,3 @@ LOGIN_REDIRECT_URL='/hg/'
 #TEMPLATE_CONTEXT_PROCESSORS = TEMPLATE_CONTEXT_PROCESSORS_DEFAULT + (BIXFILE_NAME+'.context_processors.media_url',BIXFILE_NAME+'.context_processors.bixfile_name')
 
 TEST_RUNNER='test.test_runner_custom'
-
