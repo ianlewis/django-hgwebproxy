@@ -28,6 +28,10 @@ class _hgReqWrap(object):
         if not self.env.has_key('CONTENT_LENGTH'):
             self.env['CONTENT_LENGTH'] = 0
 
+        lf = open("/tmp/django.log", 'w')
+        lf.write("self.env is %s"%self.env)
+        lf.close()
+
         self.inp = self.env['wsgi.input']
         self.form = cgi.parse(self.inp, self.env, keep_blank_values=1)
 
@@ -106,7 +110,7 @@ def hgroot(request, *args):
     resp = HttpResponse()
     hgr = _hgReqWrap(request, resp)
 
-    config = os.path.join(settings.BASE_DIR, 'apps', 'hgwebproxy', 'hgweb.conf')
+    config = '/etc/mercurial/hgweb.config'
     os.environ['HGRCPATH'] = config
 
     if request.method == "POST":
@@ -136,7 +140,7 @@ def hgroot(request, *args):
         if not resp['content-type'].startswith("text/html"):
             return resp
     
-    return render_to_response("hgwebproxy/flat.html", {
+    return render_to_response("flat.html", {
         'content': resp.content, 'slugpath': request.path.lstrip("/hg"),
         'hg_version': __version__.version, 'is_root': request.path == '/hg/' },
         RequestContext(request))
