@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import *
 
-urlpatterns = patterns('cx.apps.hgwebproxy.views',
+urlpatterns = patterns('hgwebproxy.views',
     url(r'^(.*)', 'hgroot', name='hgroot'),
 )
