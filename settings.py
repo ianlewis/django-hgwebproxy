@@ -81,6 +81,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'hgwebproxy'
 )
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
