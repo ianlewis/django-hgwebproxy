@@ -110,7 +110,7 @@ def hgroot(request, *args):
     resp = HttpResponse()
     hgr = _hgReqWrap(request, resp)
 
-    config = '/etc/mercurial/hgweb.config'
+    config = 'hgweb.conf'
     os.environ['HGRCPATH'] = config
 
     if request.method == "POST":
