@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>  Prototype for CALGB Bioinformatics Data Management Application. </title>
+<link rel="stylesheet" href="/{{ bixfile_name }}/calgb_css/" type="text/css" media="screen" />
+{% block extrahead %}{% endblock %}
+</head>
+<body>	
+<div id="container">
+<div id="multiColumnWrapper">
+<div id="twoColumnOuter">
+<div id="twoColumnCenter">
+<div id="centerClearHeader">&#160;</div>
+<div id="containerCenter">	
+
+{% if messages %}
+<ul class="messagelist">{% for message in messages %}<li>{{ message|escape }}</li>{% endfor %}</ul>
+{% endif %}
+
+<!-- Content -->
+<div id="content" class="{% block coltype %}colM{% endblock %}">
+  {% block pretitle %}{% endblock %}
+  {% block content_title %}{% if title %}<h1>{{ title|escape }}</h1>{% endif %}{% endblock %}
+  {% block content %}
+  {% block object-tools %}{% endblock %}
+  {{ content }}
+  {% endblock %}
+</div>
+<!-- END Content -->
+</div>
+<div id="centerClearFooter">&#160;</div>
+</div>						
+<div id="leftContainer">
+<div id="leftClearHeader">&#160;</div>	
+<div id="leftColumn">
+  <!-- ***************
+  * LEFT COLUMN *
+  *************** -->
+<div class="sidebar">
+{% block sidebar %}{% endblock %}
+</div>
+</div>
+<div id="leftClearFooter">&#160;</div>
+</div>
+<div class="clear">&#160;
+</div>        				
+</div>			
+<div id="twoColumnBackground">&#160;</div>
+
+</div>
+
+<div id="header">
+<div class="outerHorizontalBorder">&#160;</div>
+<div id="subHeader">
+  <!-- ********** 
+  * HEADER *
+  ********** -->
+<img src="/{{ bixfile_name }}/calgb_logo/" alt="CALGB Logo" align="left" />
+<div class="topname">Cancer and Leukemia Group B</div>
+<div class="tagline">Tomorrow's Cancer Treatments Today</div>
+<div class="appname">Prototype for CALGB Bioinformatics Data Management Application</div>
+</div>
+<div class="outerHorizontalBorder">&#160;</div>
+</div>
+<div class="clear">&#160;</div>
+
+<div id="footer">
+<div class="outerHorizontalBorder">&#160;</div>
+<div id="subFooter">
+  <!-- ********** 
+  * FOOTER *
+  ********** --> 
+{% block footer %}{% endblock %}
+</div>
+<div class="outerHorizontalBorder">&#160;</div>
+</div>  
+</div>
+</body>
+</html>
