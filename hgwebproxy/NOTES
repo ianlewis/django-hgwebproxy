@@ -1,3 +1,14 @@
+Using mod wsgi with Django.
+
+http://code.google.com/p/modwsgi/wiki/IntegrationWithDjango
+
+Making mod python speak wsgi.
+http://www.aminus.net//wiki/ModPythonGateway
+http://wiki.pylonshq.com/display/pylonscookbook/Production+deployment+using+mod_python
+
+Transcript of IRC conversation with Jesper Noehr.
+*************************************************
+
 17:29 < faheem> jespern: Any documentation available about what that does? That's quite a lot of code.
 17:29 < faheem> Also, can I check out the code from somewhere to see the whole thing?
 17:31 < faheem> Also, is anything about this in the wiki?
