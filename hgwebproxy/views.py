@@ -110,7 +110,8 @@ def hgroot(request, *args):
     resp = HttpResponse()
     hgr = _hgReqWrap(request, resp)
 
-    config = 'hgweb.conf'
+    #config = 'hgweb.conf'
+    config = '/etc/mercurial/hgweb.config'
     os.environ['HGRCPATH'] = config
 
     if request.method == "POST":
@@ -129,7 +130,13 @@ def hgroot(request, *args):
             hgr.set_user(authed)
         
     try:
+        filename = "/tmp/django.log"
+        f = open(filename, 'w')
+        f.write("config is %s."%config)
         hgwebdir(config).run_wsgi(hgr)
+        f.write("response is %s."%resp)
+        f.write("response content is %s."%resp.content)
+        f.write("hgr dict is %s."%hgr.__dict__)
     except KeyError:
         resp['content-type'] = 'text/html'
         resp.write('hgweb crashed.')
@@ -139,7 +146,8 @@ def hgroot(request, *args):
     if resp.has_header('content-type'):
         if not resp['content-type'].startswith("text/html"):
             return resp
-    
+    f.write("response content is %s."%resp.content)
+    f.close()
     return render_to_response("flat.html", {
         'content': resp.content, 'slugpath': request.path.lstrip("/hg"),
         'hg_version': __version__.version, 'is_root': request.path == '/hg/' },
