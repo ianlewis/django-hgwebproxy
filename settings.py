@@ -1,4 +1,5 @@
 # Django settings for hg project.
+import os
 
 PROJECT_NAME = 'hg'
 
@@ -9,14 +10,16 @@ ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'postgresql_psycopg2'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'hg'             # Or path to database file if using sqlite3.
-DATABASE_USER = 'django'             # Not used with sqlite3.
-DATABASE_PASSWORD = 'pqxxrocks'         # Not used with sqlite3.
-DATABASE_HOST = 'localhost'             # Set to empty string for localhost. Not used with sqlite3.
-DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
+DATABASE_ENGINE = 'sqlite3'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_NAME = 'db'             # Or path to database file if using sqlite3.
+#DATABASE_USER = 'django'             # Not used with sqlite3.
+#DATABASE_PASSWORD = 'pqxxrocks'         # Not used with sqlite3.
+#DATABASE_HOST = 'localhost'             # Set to empty string for localhost. Not used with sqlite3.
+#DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -72,7 +75,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    "/var/django/"+PROJECT_NAME+"/templates",
+    os.path.join(BASE_DIR, 'templates'),
     )
 
 INSTALLED_APPS = (

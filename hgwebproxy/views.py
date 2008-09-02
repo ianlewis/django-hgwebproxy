@@ -22,15 +22,11 @@ class _hgReqWrap(object):
         self.response = resp
 
         # Remove the prefix so HG will think it's running on its own.
-        self.env['PATH_INFO'] = self.env['PATH_INFO'].lstrip("/hg")
+        self.env['PATH_INFO'] = self.env['PATH_INFO'].replace("/hg", "", 1)
 
         # Make sure there's a content-length.
         if not self.env.has_key('CONTENT_LENGTH'):
             self.env['CONTENT_LENGTH'] = 0
-
-        lf = open("/tmp/django.log", 'w')
-        lf.write("self.env is %s"%self.env)
-        lf.close()
 
         self.inp = self.env['wsgi.input']
         self.form = cgi.parse(self.inp, self.env, keep_blank_values=1)
@@ -110,8 +106,7 @@ def hgroot(request, *args):
     resp = HttpResponse()
     hgr = _hgReqWrap(request, resp)
 
-    #config = 'hgweb.conf'
-    config = '/etc/mercurial/hgweb.config'
+    config = os.path.join(settings.BASE_DIR, 'hgwebproxy', 'hgweb.conf')
     os.environ['HGRCPATH'] = config
 
     if request.method == "POST":
@@ -130,13 +125,7 @@ def hgroot(request, *args):
             hgr.set_user(authed)
         
     try:
-        filename = "/tmp/django.log"
-        f = open(filename, 'w')
-        f.write("config is %s."%config)
         hgwebdir(config).run_wsgi(hgr)
-        f.write("response is %s."%resp)
-        f.write("response content is %s."%resp.content)
-        f.write("hgr dict is %s."%hgr.__dict__)
     except KeyError:
         resp['content-type'] = 'text/html'
         resp.write('hgweb crashed.')
@@ -146,8 +135,7 @@ def hgroot(request, *args):
     if resp.has_header('content-type'):
         if not resp['content-type'].startswith("text/html"):
             return resp
-    f.write("response content is %s."%resp.content)
-    f.close()
+
     return render_to_response("flat.html", {
         'content': resp.content, 'slugpath': request.path.lstrip("/hg"),
         'hg_version': __version__.version, 'is_root': request.path == '/hg/' },
