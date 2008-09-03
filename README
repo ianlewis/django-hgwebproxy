@@ -1,0 +1,33 @@
+Here are some notes on installation and configuration of hgwebproxy,
+which uses Django as a proxy for hgweb. In other words, when the
+request is sent to hgweb, Django gets it and relays it to hgweb, and
+then intercepts the response from hgweb, and can do post-processing on
+it if necessary. This has two advantages. One, hgweb can be put behind
+Django auth. Secondly, this makes it possible to use Django templating
+with hgweb.
+
+hgwebproxy was written by Jesper Noehr (jesper@noehr.org), with minor
+modifications by Faheem Mitha (faheem@email.unc.edu).
+
+It has been tested with Django etch. The configuration uses Apache 2,2
+and libapache2-mod-wsgi, with the following apache config. The wsgi
+script is in apache/django.wsgi.
+
+****************************************************&
+WSGIScriptAlias / /var/django/hg/apache/django.wsgi
+
+<Directory /var/django/hg/apache>
+    Order deny,allow
+    Allow from all
+</Directory>
+*****************************************************
+
+This application uses sqlite as the database by default, so you will
+need to install python-pysqlite2 and sqlite3. Note also that the
+project directory and the sqlite database file (db by default) need to
+be readable and writable by the apache user (www-data for Debian). One
+way of doing so is to set the group for these to www-data and make
+them group writable.
+
+The hgweb config is in hgwebproxy/hgweb.conf, and may be changed as
+necessary.
