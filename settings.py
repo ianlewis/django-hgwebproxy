@@ -16,10 +16,10 @@ MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'sqlite3'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 DATABASE_NAME = os.path.join(BASE_DIR, 'db')             # Or path to database file if using sqlite3.
-#DATABASE_USER = 'django'             # Not used with sqlite3.
-#DATABASE_PASSWORD = 'pqxxrocks'         # Not used with sqlite3.
-#DATABASE_HOST = 'localhost'             # Set to empty string for localhost. Not used with sqlite3.
-#DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
+DATABASE_USER = ''             # Not used with sqlite3.
+DATABASE_PASSWORD = ''         # Not used with sqlite3.
+DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -93,7 +93,3 @@ SESSION_COOKIE_AGE = 1800
 SESSION_COOKIE_NAME = 'hg'
 LOGIN_URL = '/hg/login/'
 LOGIN_REDIRECT_URL='/hg/'
-
-#TEMPLATE_CONTEXT_PROCESSORS = TEMPLATE_CONTEXT_PROCESSORS_DEFAULT + (BIXFILE_NAME+'.context_processors.media_url',BIXFILE_NAME+'.context_processors.bixfile_name')
-
-TEST_RUNNER='test.test_runner_custom'
