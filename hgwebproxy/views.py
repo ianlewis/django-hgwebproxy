@@ -1,3 +1,15 @@
+"""
+hgwebproxy.py
+
+Simple Django view code that proxies requests through
+to `hgweb` and handles authentication on `POST` up against
+Djangos own built in authentication layer.
+
+This code is largely equivalent to the code powering Bitbucket.org.
+"""
+
+__docformat__ = "restructedtext"
+
 import os, re, cgi, base64
 from django.http import HttpResponseRedirect, HttpResponse
 from django.conf import settings
@@ -9,7 +21,6 @@ from datetime import datetime
 
 from mercurial.hgweb.hgwebdir_mod import hgwebdir
 from mercurial import hg, ui
-from mercurial import __version__
 
 try:
     from hashlib import md5 as md5
@@ -17,7 +28,34 @@ except ImportError:
     from md5 import md5
 
 class _hgReqWrap(object):
+    """
+    Request wrapper. The main purpose of this class
+    is to wrap Djangos own `HttpResponse` object, so it
+    behaves largely as a `WSGI` compliant request object,
+    which is what `hgweb` expects.
+    
+    `hgweb` does lot of `.write()` operations on the request
+    object given, and we simply stream them into Django.
+    
+    Notice the `set_user` method, which sets the environment
+    variable `REMOTE_USER` to the user you just authenticated.
+    This allows `hgweb` to pick up the username as well.
+    
+    Example::
+        >>> resp = HttpResponse()
+        >>> hgr = _hgReqWrap(request, resp)
+        >>> hgwebdir('path to config file').run_wsgi(hgr)
+        >>> print resp.content
+        ...
+    """
     def __init__(self, req, resp):
+        """
+        Expects two parameters;
+        
+        Parameters::
+         - `req`: The `request` object your view receives.
+         - `resp`: An instance of `HttpResponse`.
+        """
         self.django_req = req
         self.env = req.META
         self.response = resp
@@ -38,15 +76,26 @@ class _hgReqWrap(object):
         self.out = [ ]
 
     def set_user(self, username):
+        """
+        Sets the username for the request.
+        `hgweb` picks up on this, call after you've authenticated.
+        """
         self.env['REMOTE_USER'] = username
 
     def read(self, count=-1):
         return self.inp.read(count)
 
     def flush(self):
+        """
+        Doesn't do anything, but `WSGI` requires it.
+        """
         return None
 
     def respond(self, code, content_type=None, path=None, length=0):
+        """
+        `hgweb` uses this for headers, and is necessary to have things
+        like "Download tarball" working.
+        """
         self.response.status_code = code
 
         self.response['content-type'] = content_type
@@ -60,9 +109,16 @@ class _hgReqWrap(object):
             self.response[directive.lower()] = value
 
     def header(self, headers=[('Content-Type','text/html')]):
+        """
+        Set a header for the request. `hgweb` uses this too.
+        """
         self.headers.extend(headers)
 
     def write(self, *a):
+        """
+        Write content to a buffered stream. Can be a string
+        or an iterator of strings.
+        """
         for thing in a:
             if hasattr(thing, '__iter__'):
                 for p in thing:
@@ -72,6 +128,13 @@ class _hgReqWrap(object):
                 self.response.write(thing)
 
 def basic_auth(request, realm):
+    """
+    Very simple Basic authentication handler which hooks
+    up to Djangos underlying database of users directly.
+    
+    Returns the username on successful auth, can be used
+    together with `set_user` on the request wrapper.
+    """
     auth_string = request.META.get('HTTP_AUTHORIZATION')
     
     if auth_string is None or not auth_string.startswith("Basic"):
@@ -89,9 +152,20 @@ def hgroot(request, *args):
     resp = HttpResponse()
     hgr = _hgReqWrap(request, resp)
 
+    """
+    You want to specify the path to your config file here. Look
+    at `hgweb.conf` for a working example.
+    """
     config = os.path.join(settings.BASE_DIR, 'hgwebproxy', 'hgweb.conf')
     os.environ['HGRCPATH'] = config
 
+    """
+    Only authenticate on `POST` request, although this could easily
+    be fitted to support both `POST` and `GET` (just remove the `if`).
+    
+    The way it is now, repositories are readable by anyone, but only
+    authenticated users can push.
+    """
     if request.method == "POST":
         realm = 'Django Basic Auth' # Change me, if you want.
 
@@ -104,6 +178,11 @@ def hgroot(request, *args):
         else:
             hgr.set_user(authed)
         
+    """
+    Run the `hgwebdir` method from Mercurial directly, with
+    our incognito request wrapper, output will be buffered. Wrapped
+    in a try:except: since `hgweb` *can* crash.
+    """
     try:
         hgwebdir(config).run_wsgi(hgr)
     except KeyError:
@@ -112,11 +191,18 @@ def hgroot(request, *args):
         pass # hgweb tends to throw these on invalid requests..?
              # nothing to do but ignore it. hg >1.0 might fix.
 
+    """
+    In cases of downloading raw files or tarballs, we don't want to
+    pass the output to our template, so instead we just return it as-is.
+    """
     if resp.has_header('content-type'):
         if not resp['content-type'].startswith("text/html"):
             return resp
 
-    return render_to_response("flat.html", {
-        'content': resp.content, 'slugpath': request.path.lstrip("/hg"),
-        'hg_version': __version__.version, 'is_root': request.path == '/hg/' },
+    """
+    Otherwise, send the content on to the template, for any kind
+    of custom layout you want around it.
+    """
+    return render_to_response("flat.html", 
+        { 'content': resp.content, },
         RequestContext(request))
