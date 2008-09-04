@@ -1,7 +1,8 @@
-import os, re, cgi
+import os, re, cgi, base64
 from django.http import HttpResponseRedirect, HttpResponse
 from django.conf import settings
 from django.shortcuts import render_to_response
+from django.contrib.auth import authenticate
 from django.template import RequestContext
 from django.contrib.auth.models import User
 from datetime import datetime
@@ -70,35 +71,17 @@ class _hgReqWrap(object):
                 thing = str(thing)
                 self.response.write(thing)
 
-def digest_auth(request, realm, opaque, users):
-    auth_string = request.META.get('HTTP_AUTHORIZATION', None)
-
-    if auth_string is None and not str(auth_string).startswith("Digest"):
+def basic_auth(request, realm):
+    auth_string = request.META.get('HTTP_AUTHORIZATION')
+    
+    if auth_string is None or not auth_string.startswith("Basic"):
         return False
-
-    parts = auth_string.lstrip("Digest ").split(",")
-
-    auth = { }
-
-    for part in parts: # `partition' only in 2.5
-        segs = part.lstrip().split("=")
-        auth[segs[0]] = '='.join(segs[1:]).strip('"')
-
-    # Quick opaque check
-    if not opaque == auth['opaque']:
-        return False
-
-    for ha1 in users:
-        ha2 = md5("%(method)s:%(path)s" % { 'method': request.method,
-                                            'path': request.get_full_path() })
-
-        response = md5("%(ha_one)s:%(nonce)s:%(nc)s:%(cnonce)s:%(qop)s:%(ha_two)s" \
-            % { 'ha_one': ha1, 'ha_two': ha2.hexdigest(), 
-                'nonce': auth['nonce'], 'nc': auth['nc'],
-                'cnonce': auth['cnonce'], 'qop': auth['qop'] })
-                
-        if response.hexdigest() == auth['response']:
-            return auth['username']
+        
+    _, basic_hash = auth_string.split(' ', 1)
+    username, password = basic_hash.decode('base64').split(':', 1)
+    
+    if authenticate(username=username, password=password):
+        return username
     
     return False
 
@@ -110,16 +93,13 @@ def hgroot(request, *args):
     os.environ['HGRCPATH'] = config
 
     if request.method == "POST":
-        realm = "hg@%s" % settings.SITE_NAME
-        nonce = md5(str(datetime.now())+realm).hexdigest()
-        opaque = md5(settings.SITE_NAME).hexdigest()
+        realm = 'Django Basic Auth' # Change me, if you want.
 
-        users = settings.HG_DIGEST_USERS
-        authed = digest_auth(request, realm, opaque, users)
+        authed = basic_auth(request, realm)
 
         if not authed:
             resp.status_code = 401
-            resp['WWW-Authenticate'] = '''Digest realm="%s", qop="auth", nonce="%s", opaque="%s"''' % (realm, nonce, opaque)
+            resp['WWW-Authenticate'] = '''Basic realm="%s"''' % realm
             return resp
         else:
             hgr.set_user(authed)
