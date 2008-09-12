@@ -1,20 +1,22 @@
 This directory is a Django project which contains hgwebproxy as a
-Django application.
+Django application. These are some notes on installation and
+configuration of hgwebproxy.
 
-Here are some notes on installation and configuration of hgwebproxy,
-which uses Django as a proxy for hgweb. In other words, when the
-request is sent to hgweb, Django gets it and relays it to hgweb, and
-then intercepts the response from hgweb, and can do post-processing on
-it if necessary. This has two advantages. One, hgweb can be put behind
+hgwebproxy was written by Jesper Noehr (jesper@noehr.org), with minor
+modifications by Faheem Mitha (faheem@email.unc.edu). It uses code
+from https://bitbucket.org/jespern/cx/.  Hgwebproxy uses Django as a
+proxy for hgweb. In other words, when the request is sent to hgweb,
+Django gets it and relays it to hgweb, and then intercepts the
+response from hgweb, and can do post-processing on it if
+necessary. This has two advantages. One, hgweb can be put behind
 Django auth. Secondly, this makes it possible to use Django templating
 with hgweb.
 
-hgwebproxy was written by Jesper Noehr (jesper@noehr.org), with minor
-modifications by Faheem Mitha (faheem@email.unc.edu).
-
 It has been tested under Debian etch with Apache 2,2 and mod_wsgi
 (libapache2-mod-wsgi) and Django 1.0, with the following apache
-config. The wsgi script is in apache/django.wsgi.
+config. The wsgi script is in apache/django.wsgi. This configuration
+was largely copied from
+http://code.google.com/p/modwsgi/wiki/IntegrationWithDjango.
 
 ****************************************************&
 WSGIScriptAlias / /var/django/hg/apache/django.wsgi
@@ -24,6 +26,11 @@ WSGIPassAuthorization On
     Allow from all
 </Directory>
 *****************************************************
+
+The WSGIPassAuthorization line is necessary to enable the hgwebproxy
+to handle authorization rather than Apache. See
+http://code.google.com/p/modwsgi/wiki/ConfigurationDirectives#WSGIPassAuthorization
+for further information.
 
 It can also be run using Django's built-in webserver (python manage.py
 runserver).
@@ -42,7 +49,9 @@ The default authentication config is to have all requests
 authenticated. To authenticate against only 'POST' requests, as is
 appropriate if you desire the repositories to be world-readable, but
 only writable by authenticated users, see comments in the hgroot view
-in hgwebproxy/views.py.
+in hgwebproxy/views.py. Hgwebproxy uses Django's underlying database
+of users and passwords. See basic_auth in hgwebproxy/views.py for
+details.
 
 By default, the repositories are viewable at the url /servername/hg/.
 
