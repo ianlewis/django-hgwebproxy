@@ -158,25 +158,27 @@ def hgroot(request, *args):
     """
     config = os.path.join(settings.BASE_DIR, 'hgwebproxy', 'hgweb.conf')
     os.environ['HGRCPATH'] = config
-
-    """
-    Only authenticate on `POST` request, although this could easily
-    be fitted to support both `POST` and `GET` (just remove the `if`).
     
-    The way it is now, repositories are readable by anyone, but only
-    authenticated users can push.
     """
-    if request.method == "POST":
-        realm = 'Django Basic Auth' # Change me, if you want.
+    Authenticate on all requests. To authenticate only against 'POST'
+    requests, uncomment the line below the comment.
 
-        authed = basic_auth(request, realm)
+    Currently, repositories are only viewable by authenticated users.
+    If authentication is only done on 'POST' request, then
+    repositories are readable by anyone. but only authenticated users
+    can push.
+    """
+    #if request.method == "POST":
+    realm = 'Django Basic Auth' # Change me, if you want.
 
-        if not authed:
-            resp.status_code = 401
-            resp['WWW-Authenticate'] = '''Basic realm="%s"''' % realm
-            return resp
-        else:
-            hgr.set_user(authed)
+    authed = basic_auth(request, realm)
+
+    if not authed:
+        resp.status_code = 401
+        resp['WWW-Authenticate'] = '''Basic realm="%s"''' % realm
+        return resp
+    else:
+        hgr.set_user(authed)
         
     """
     Run the `hgwebdir` method from Mercurial directly, with
