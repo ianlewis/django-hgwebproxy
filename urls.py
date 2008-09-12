@@ -15,10 +15,10 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-                       url(r'^hg/login/$', 'django.contrib.auth.views.login', {'template_name':'registration/login.html'}, name='login'),
-                       url(r'^hg/logout/$', 'django.contrib.auth.views.logout', {'template_name':'registration/logout.html'}, name='logout'),
+                       url(r'^login/$', 'django.contrib.auth.views.login', {'template_name':'registration/login.html'}, name='login'),
+                       url(r'^logout/$', 'django.contrib.auth.views.logout', {'template_name':'registration/logout.html'}, name='logout'),
                        #url(r'^hg/admin/', include('django.contrib.admin.urls')),
-                       url(r'^hg/admin/(.*)', admin.site.root),
-                       url(r'^hg/', include('hg.hgwebproxy.urls')),
+                       url(r'^admin/(.*)', admin.site.root),
+                       url(r'^(.*)', include('hg.hgwebproxy.urls')),
 
                        )

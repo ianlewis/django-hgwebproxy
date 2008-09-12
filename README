@@ -8,9 +8,9 @@ from https://bitbucket.org/jespern/cx/.  Hgwebproxy uses Django as a
 proxy for hgweb. In other words, when the request is sent to hgweb,
 Django gets it and relays it to hgweb, and then intercepts the
 response from hgweb, and can do post-processing on it if
-necessary. This has two advantages. One, hgweb can be put behind
-Django auth. Secondly, this makes it possible to use Django templating
-with hgweb.
+necessary. This has two advantages. One, hgweb can use Django's
+pre-existing database of users and passwords. Secondly, this makes it
+possible to use Django templating with hgweb.
 
 It has been tested under Debian etch with Apache 2,2 and mod_wsgi
 (libapache2-mod-wsgi) and Django 1.0, with the following apache
@@ -19,7 +19,7 @@ was largely copied from
 http://code.google.com/p/modwsgi/wiki/IntegrationWithDjango.
 
 ****************************************************&
-WSGIScriptAlias / /var/django/hg/apache/django.wsgi
+WSGIScriptAlias /hg /var/django/hg/apache/django.wsgi
 WSGIPassAuthorization On
 <Directory /var/django/hg/apache>
     Order deny,allow
@@ -53,7 +53,8 @@ in hgwebproxy/views.py. Hgwebproxy uses Django's underlying database
 of users and passwords. See basic_auth in hgwebproxy/views.py for
 details.
 
-By default, the repositories are viewable at the url /servername/hg/.
+By default with the Apache configuration given above, the repositories
+are viewable at the url /servername/hg/.
 
 Faheem Mitha <faheem@email.unc.edu> and Jesper Noehr <jesper@noehr.org>
 September 2008.
