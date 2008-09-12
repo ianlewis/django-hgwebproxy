@@ -1,3 +1,6 @@
+This directory is a Django project which contains hgwebproxy as a
+Django application.
+
 Here are some notes on installation and configuration of hgwebproxy,
 which uses Django as a proxy for hgweb. In other words, when the
 request is sent to hgweb, Django gets it and relays it to hgweb, and
@@ -9,25 +12,39 @@ with hgweb.
 hgwebproxy was written by Jesper Noehr (jesper@noehr.org), with minor
 modifications by Faheem Mitha (faheem@email.unc.edu).
 
-It has been tested with Django etch. The configuration uses Apache 2,2
-and libapache2-mod-wsgi, with the following apache config. The wsgi
-script is in apache/django.wsgi.
+It has been tested under Debian etch with Apache 2,2 and mod_wsgi
+(libapache2-mod-wsgi) and Django 1.0, with the following apache
+config. The wsgi script is in apache/django.wsgi.
 
 ****************************************************&
 WSGIScriptAlias / /var/django/hg/apache/django.wsgi
-
+WSGIPassAuthorization On
 <Directory /var/django/hg/apache>
     Order deny,allow
     Allow from all
 </Directory>
 *****************************************************
 
-This application uses sqlite as the database by default, so you will
-need to install python-pysqlite2 and sqlite3. Note also that the
-project directory and the sqlite database file (db by default) need to
-be readable and writable by the apache user (www-data for Debian). One
+It can also be run using Django's built-in webserver (python manage.py
+runserver).
+
+This project uses sqlite as the database by default, so you will need
+to install python-pysqlite2 and sqlite3. Note also that the project
+directory and the sqlite database file (db by default) need to be
+readable and writable by the apache user (www-data for Debian). One
 way of doing so is to set the group for these to www-data and make
 them group writable.
 
 The hgweb config is in hgwebproxy/hgweb.conf, and may be changed as
 necessary.
+
+The default authentication config is to have all requests
+authenticated. To authenticate against only 'POST' requests, as is
+appropriate if you desire the repositories to be world-readable, but
+only writable by authenticated users, see comments in the hgroot view
+in hgwebproxy/views.py.
+
+By default, the repositories are viewable at the url /servername/hg/.
+
+Faheem Mitha <faheem@email.unc.edu> and Jesper Noehr <jesper@noehr.org>
+September 2008.
