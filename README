@@ -56,5 +56,20 @@ details.
 By default with the Apache configuration given above, the repositories
 are viewable at the url /servername/hg/.
 
+At first sight, it seems simpler to use Django authentication instead
+of having the application doing the authentication. The reason for
+doing it this way is so the authentication will work with hg command
+line operations.
+
+In other words, operations of the form
+
+hg clone/pull/push https://servername/hg/faheem/test
+
+can use basic_auth.
+
+An alternative and preferable method is to use Django authentication
+for the browser, and basic_auth for the command line. This is a
+planned enhancement.
+
 Faheem Mitha <faheem@email.unc.edu> and Jesper Noehr <jesper@noehr.org>
 September 2008.
