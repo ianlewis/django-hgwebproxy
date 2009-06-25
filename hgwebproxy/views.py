@@ -192,9 +192,14 @@ def hgroot(request, *args):
         resp.write('hgweb crashed.')
         pass # hgweb tends to throw these on invalid requests..?
              # nothing to do but ignore it. hg >1.0 might fix.
-	content = []
-	for each in tmpl:
-		content.append(each)
+    """
+    Mercurial now sends the content through as a generator.
+    We need to iterate over the output in order to get all of the content
+    """
+    if tmpl:
+        content = []
+        for each in tmpl:
+            content.append(each)
 
     """
     In cases of downloading raw files or tarballs, we don't want to
