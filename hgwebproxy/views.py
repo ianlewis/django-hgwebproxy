@@ -186,12 +186,15 @@ def hgroot(request, *args):
     in a try:except: since `hgweb` *can* crash.
     """
     try:
-        hgwebdir(config).run_wsgi(hgr)
+        tmpl = hgwebdir(config).run_wsgi(hgr)
     except KeyError:
         resp['content-type'] = 'text/html'
         resp.write('hgweb crashed.')
         pass # hgweb tends to throw these on invalid requests..?
              # nothing to do but ignore it. hg >1.0 might fix.
+	content = []
+	for each in tmpl:
+		content.append(each)
 
     """
     In cases of downloading raw files or tarballs, we don't want to
@@ -206,5 +209,5 @@ def hgroot(request, *args):
     of custom layout you want around it.
     """
     return render_to_response("flat.html", 
-        { 'content': resp.content, },
+        { 'content': ''.join(content), },
         RequestContext(request))
