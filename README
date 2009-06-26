@@ -67,9 +67,9 @@ hg clone/pull/push https://servername/hg/faheem/test
 
 can use basic_auth.
 
-An alternative and preferable method is to use Django authentication
-for the browser, and basic_auth for the command line. This is a
-planned enhancement.
+Basic Authentication is now only used for requests made by a mercurial program
+that uses the mercural user agent. All other web requests will use
+Django Authentication.
 
 The changes to HGWebDir that came in the 1.0 version of Mercurial changed how the
 content was returned from the call to HGWebDir.run_wsgi. As a result the
