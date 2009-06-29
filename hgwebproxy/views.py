@@ -199,7 +199,7 @@ def hgroot(request, *args):
             return HttpResponseRedirect('%s?next=%s' % 
                                         (settings.LOGIN_URL,request.path))
         else:
-            authed = request.user
+            authed = request.user.username
 
     if not authed:
         resp.status_code = 401
