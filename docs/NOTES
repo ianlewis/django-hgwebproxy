@@ -1,0 +1,57 @@
+Using mod wsgi with Django.
+
+http://code.google.com/p/modwsgi/wiki/IntegrationWithDjango
+
+Making mod python speak wsgi.
+http://www.aminus.net//wiki/ModPythonGateway
+http://wiki.pylonshq.com/display/pylonscookbook/Production+deployment+using+mod_python
+
+Transcript of IRC conversation with Jesper Noehr.
+*************************************************
+
+17:29 < faheem> jespern: Any documentation available about what that does? That's quite a lot of code.
+17:29 < faheem> Also, can I check out the code from somewhere to see the whole thing?
+17:31 < faheem> Also, is anything about this in the wiki?
+17:51 < jespern> faheem: that code is from my blog, where I hosted some projects in hg via django, but bitbucket is basically based on that code
+17:52 < jespern> faheem: hence it's not documented at all, unless I give you the copy we use in bb (which I won't)
+17:52 < jespern> faheem: but any questions can be directed at me
+17:52 < faheem> jespern: Nothing to checkout then? Cut and paste from web page is awkward.
+17:52 < jespern> faheem: well, I can tell you what it does
+17:53 < faheem> jespern: Ok, thanks. Please do.
+17:53 < faheem> Might be of general interest. Perhaps consider a wiki page?
+17:53 < jespern> maybe.. it's nothing official
+17:54 < jespern> well there's a class, _hgReqWrap that wraps a django request object in a way that behaves the same way as wsgirequest from
+                 hgweb does
+17:54 < jespern> so basically:
+17:54 < jespern>     resp = HttpResponse()
+17:54 < jespern>     hgr = _hgReqWrap(request, resp)
+17:54 < faheem> jespern: All I want to do it put a hg repos web interface behind django's auth layer, that is all.
+17:54 < jespern> hgwebdir(config).run_wsgi(hgr)
+17:54 < jespern> right, well, I do digest auth on requests,
+17:55 < jespern> so basically just toss your own auth layer on top before you do hgwebdir(...
+17:55 < faheem> jespern: Sorry, go on.
+17:55 < jespern> and make sure you set the user with hgr.set_user(), that way hg sees it too
+17:56 < jespern> all it does is proxy requests through to hgweb and captures the output in a django response object
+17:56 < jespern> so you may do whatever you want before that, like auth
+17:56 < faheem> jespern: Would not a simple approach of only allowing an authenticated user to access the url where the hg repos is located work?
+17:57 < jespern> sure, but you can just use apache for that
+17:57 < faheem> jespern: Apache auth requires reauth even with page refreshes, though.
+17:58 < faheem> jespern: Can you elaborate on what advantages your method has?
+17:58 < jespern> I don't think it does, no?
+17:58 < jespern> my methods advantage is granular control, as you can look at the request before you decide to do anything
+17:58 < faheem> jespern: That's according to the docs for basic.
+17:58 < faheem> I don't know about digest.
+17:58 < jespern> faheem: well, your browser will re-auth automatically, and so will hg
+17:59 < faheem> jespern: I see. That has some advantages.
+17:59 < jespern> digest is just a more secure way of doing it
+17:59 < jespern> basic is plain, digest is nonced/hashed
+17:59 < faheem> jespern: You mean I don't have to keep typing a password again?
+17:59 < jespern> right.
+18:00 < faheem> Well, there might be some scalability advantages with django. Ie. if I want to do something more complicated later.
+18:01 < jespern> for plugging in your own auth layer (using djangos authn/authz), it makes sense
+18:01 < faheem> I'll take a look at your code. Ok if I ask you questions later? Are you often on this channel?
+18:01 < jespern> and you don't have to use digest
+18:01 < jespern> the algorithm is simple though, described here: http://en.wikipedia.org/wiki/Digest_access_authentication
+18:01 < faheem> jespern: How does django auth compare to basic/digest in terms of security?
+18:02 < jespern> faheem: well django's auth is just a backend, if you want to auth with http 401, you still have to use basic or digest, it's
+                 just a matter of where it will find the usernames/passwords
