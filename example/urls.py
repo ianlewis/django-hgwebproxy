@@ -5,7 +5,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
-    url(r'^(.*)', 'hgroot', name='hgroot'),
+    (r'^hg/', include('hgwebproxy.urls')),
 )
 
 from django.conf import settings

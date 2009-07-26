@@ -1,0 +1,50 @@
+{% extends "admin/index.html" %}
+{% load i18n humanize %}
+
+{% block title %}Repository List{% endblock %}
+{% block extrastyle %}
+{{block.super}}
+<style>
+.dashboard #content { width: 700px !important;}
+</style>
+{% endblock %}
+
+{% if not is_popup %}
+  {% block breadcrumbs %}
+    <div class="breadcrumbs">
+      <a href="/admin/">
+        {% trans "Home" %}
+      </a>
+       &rsaquo;
+       Repo List
+    </div>
+  {% endblock %}
+{% endif %}
+{% block sidebar %}{% endblock %}
+{% block bodyclass%}dashboard{% endblock %}
+{% block content %}
+<h1>Lista de repositorios</h1>
+<div id="content-main">
+    <div class="module">
+        <table>
+            <caption>
+                Proyectos
+            </caption>
+            <tbody>
+            {% for repo in repos_list %}
+            <tr>
+            <th scope="row">
+                <a href="{{repo.get_absolute_url}}">
+                {{ repo.name }}
+                </a>
+            </th>
+            <td>
+            owner {{ repo.owner }}
+            </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

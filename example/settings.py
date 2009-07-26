@@ -13,7 +13,7 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'sqlite3'
-DATABASE_NAME = os.path.join('BASE_DIR','example','database.sqlite')
+DATABASE_NAME = os.path.join(BASE_DIR, 'example', 'database.sqlite')
 DATABASE_USER = ''             # Not used with sqlite3.
 DATABASE_PASSWORD = ''         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
@@ -93,5 +93,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
+    'django.contrib.humanize',
     'hgwebproxy',
 )
+
+HG_CONFIG_WEBDIR = os.path.join(BASE_DIR, 'example', 'hgweb.conf')
