@@ -1,40 +1,26 @@
 #header#
-    <title>#repo|escape#: graph</title>
-    <link rel="alternate" type="application/atom+xml" href="{url}atom-log" title="Atom feed for #repo|escape#"/>
-    <link rel="alternate" type="application/rss+xml" href="{url}rss-log" title="RSS feed for #repo|escape#"/>
-    <!--[if IE]><script type="text/javascript" src="#staticurl#excanvas.js"></script><![endif]-->
-</head>
-
-<body>
+<!--[if IE]><script type="text/javascript" src="#staticurl#excanvas.js"></script><![endif]-->
 <div id="container">
     <div class="page-header">
         <h1><a href="{url}summary{sessionvars%urlparameter}">#repo|escape#</a> / graph</h1>
 
-        <form action="{url}log">
-            {sessionvars%hiddenformentry}
-            <dl class="search">
-                <dt><label>Search: </label></dt>
-                <dd><input type="text" name="rev" /></dd>
-            </dl>
-        </form>
-
-        <ul class="page-nav">
+        <ul class="object-tools">
             <li><a href="{url}summary{sessionvars%urlparameter}">summary</a></li>
             <li><a href="{url}shortlog{sessionvars%urlparameter}">shortlog</a></li>
             <li><a href="{url}changelog{sessionvars%urlparameter}">changelog</a></li>
-            <li class="current">graph</li>
+            <li class="current"><a href="{url}graph/{node|short}{sessionvars%urlparameter}">graph</a></li>
             <li><a href="{url}tags{sessionvars%urlparameter}">tags</a></li>
             <li><a href="{url}file/#node|short#{sessionvars%urlparameter}">files</a></li>
         </ul>
     </div>
 
-    <h2 class="no-link no-border">graph</h2>
 
     <div id="noscript">The revision graph only works with JavaScript-enabled browsers.</div>
     <div id="wrapper">
         <ul id="nodebgs"></ul>
         <canvas id="graph" width="224" height="#canvasheight#"></canvas>
         <ul id="graphnodes"></ul>
+        <div>
     </div>
 
     <script type="text/javascript" src="#staticurl#graph.js"></script>
@@ -98,7 +84,7 @@
             tagspan += '</span>';
         }
 
-        item = item.replace(/_TAGS/, tagspan); 
+        item = item.replace(/_TAGS/, tagspan);
         return [bg, item];
 
     }

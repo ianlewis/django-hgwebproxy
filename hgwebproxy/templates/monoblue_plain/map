@@ -19,18 +19,18 @@ changelogentry = changelogentry.tmpl
 searchentry = changelogentry.tmpl
 changeset = changeset.tmpl
 manifest = manifest.tmpl
-direntry = '<tr class="parity#parity#"><td>drwxr-xr-x</td><td></td><td></td><td><a href="#url#file/#node|short##path|urlescape#{sessionvars%urlparameter}">#basename|escape#</a></td><td><a href="#url#file/#node|short##path|urlescape#{sessionvars%urlparameter}">files</a></td></tr>'
-fileentry = '<tr class="parity#parity#"><td>#permissions|permissions#</td><td>#date|isodate#</td><td>#size#</td><td><a href="#url#file/#node|short#/#file|urlescape#{sessionvars%urlparameter}">#basename|escape#</a></td><td><a href="#url#file/#node|short#/#file|urlescape#{sessionvars%urlparameter}">file</a> | <a href="#url#log/#node|short#/#file|urlescape#{sessionvars%urlparameter}">revisions</a> | <a href="#url#annotate/#node|short#/#file|urlescape#{sessionvars%urlparameter}">annotate</a></td></tr>'
+direntry = '<tr class="row#parity#"><td>drwxr-xr-x</td><td></td><td></td><td><a href="#url#file/#node|short##path|urlescape#{sessionvars%urlparameter}">#basename|escape#</a></td><td><a href="#url#file/#node|short##path|urlescape#{sessionvars%urlparameter}">files</a></td></tr>'
+fileentry = '<tr class="row#parity#"><td>#permissions|permissions#</td><td>#date|isodate#</td><td>#size#</td><td><a href="#url#file/#node|short#/#file|urlescape#{sessionvars%urlparameter}">#basename|escape#</a></td><td><a href="#url#file/#node|short#/#file|urlescape#{sessionvars%urlparameter}">file</a> | <a href="#url#log/#node|short#/#file|urlescape#{sessionvars%urlparameter}">revisions</a> | <a href="#url#annotate/#node|short#/#file|urlescape#{sessionvars%urlparameter}">annotate</a></td></tr>'
 filerevision = filerevision.tmpl
 fileannotate = fileannotate.tmpl
 filediff = filediff.tmpl
 filelog = filelog.tmpl
-fileline = '<div style="font-family:monospace" class="parity#parity#"><pre><a class="linenr" href="##lineid#" id="#lineid#">#linenumber#</a> #line|escape#</pre></div>'
-annotateline = '<tr class="parity{parity}"><td class="linenr"><a href="{url}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}#{targetline}" title="{node|short}: {desc|escape|firstline}">{author|user}@{rev}</a></td><td class="lineno"><a href="#{lineid}" id="{lineid}">{linenumber}</a></td><td class="source">{line|escape}</td></tr>'
-difflineplus = '<span style="color:#008800;"><a class="linenr" href="##lineid#" id="#lineid#">#linenumber#</a> #line|escape#</span>'
-difflineminus = '<span style="color:#cc0000;"><a class="linenr" href="##lineid#" id="#lineid#">#linenumber#</a> #line|escape#</span>'
-difflineat = '<span style="color:#990099;"><a class="linenr" href="##lineid#" id="#lineid#">#linenumber#</a> #line|escape#</span>'
-diffline = '<span><a class="linenr" href="##lineid#" id="#lineid#">#linenumber#</a> #line|escape#</span>'
+fileline = '<tr class="row#parity#"><td class="linenr"><a class="linenr" href="##lineid#" id="#lineid#">#linenumber#</a></td><td class="source">#line|escape#</td></tr>'
+annotateline = '<tr class="row{parity}"><td class="linenr"><a href="{url}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}#{targetline}" title="{node|short}: {desc|escape|firstline}">{author|user}@{rev}</a></td><td class="linenr"><a href="#{lineid}" id="{lineid}">{linenumber}</a></td><td class="source">{line|escape}</td></tr>'
+difflineplus = '<span style="color:#008800;"><a href="##lineid#" id="#lineid#">#linenumber#</a> #line|escape#</span>'
+difflineminus = '<span style="color:#cc0000;"><a href="##lineid#" id="#lineid#">#linenumber#</a> #line|escape#</span>'
+difflineat = '<span style="color:#990099;"><a href="##lineid#" id="#lineid#">#linenumber#</a> #line|escape#</span>'
+diffline = '<span><a href="##lineid#" id="#lineid#">#linenumber#</a> #line|escape#</span>'
 changelogparent = '<tr><th class="parent">parent #rev#:</th><td class="parent"><a href="#url#rev/#node|short#{sessionvars%urlparameter}">#node|short#</a></td></tr>'
 changesetbranch = '<dt>branch</dt><dd>{name}</dd>'
 changesetparent = '<dt>parent {rev}</dt><dd><a href="{url}rev/{node|short}{sessionvars%urlparameter}">{node|short}</a></dd>'
