@@ -11,14 +11,18 @@ This code is largely equivalent to the code powering Bitbucket.org.
 __docformat__ = "restructedtext"
 
 import os
+
 from django.http import HttpResponseRedirect, HttpResponse
 from django.conf import settings
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+
 from hgwebproxy.proxy import HgRequestWrapper
 from hgwebproxy.utils import is_mercurial
 from hgwebproxy.models import Repository
+
 from mercurial.hgweb import hgwebdir, hgweb
 from mercurial import hg, ui
 
@@ -82,8 +86,8 @@ def repo(request, slug, *args):
     hgserve.reponame = repo.slug
     hgserve.templatepath = template_dir
     hgserve.repo.ui.setconfig('web', 'style', 'monoblue_plain')
-    hgserve.repo.ui.setconfig('web', 'baseurl', '/hg/openit/')
-    hgserve.repo.ui.setconfig('web', 'staticurl', '/static/')
+    hgserve.repo.ui.setconfig('web', 'baseurl', reverse('repo_detail', args=[hgserve.reponame]) )
+    hgserve.repo.ui.setconfig('web', 'staticurl', settings.MEDIA_URL)
 
     try:
         response.write(''.join([each for each in hgserve.run_wsgi(hgr)]))
