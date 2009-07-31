@@ -11,7 +11,7 @@
         {% trans "Home" %}
       </a>
        &rsaquo;
-      <a href="/hg/">
+      <a href="{% url repo_list %}">
         Repo List
       </a>
        &rsaquo;
@@ -32,10 +32,9 @@
         font-weight: bold;
         clear:left;
     }
-
     dd {
-    margin-left: 16em;
-    padding: .5em;
+        margin-left: 16em;
+        padding: .5em;
     }
     table#changes_list {
         table-layout:fixed;
