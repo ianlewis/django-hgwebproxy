@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base_site.html" %}
 
 {% block content %}
 
@@ -7,10 +7,14 @@
   {% endif %}
 
   <form action='.' method='post'>
+    <p>
     <label for="username">User name:</label>
     <input type="text" name="username" value="" id="username"/>
+    </p>
+    <p>
     <label for="password">Password:</label>
     <input type="password" name="password" value="" id="password"/>
+    </p>
     <input type="submit" value="login" />
     <input type="hidden" name="next" value="{{ next }}" />
   </form>
