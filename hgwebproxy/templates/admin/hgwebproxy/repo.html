@@ -1,0 +1,53 @@
+{% extends "admin/base_site.html" %}
+{% load i18n adminmedia %}
+{% block title %}
+	{{ repo.name }} :: {{ slugpath }}
+{% endblock %}
+
+{% if not is_popup %}
+  {% block breadcrumbs %}
+    <div class="breadcrumbs">
+      <a href="/admin/">
+        {% trans "Home" %}
+      </a>
+       &rsaquo;
+      <a href="{% url repo_list %}">
+        Repo List
+      </a>
+       &rsaquo;
+       {{ repo.name }}
+    </div>
+  {% endblock %}
+{% endif %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/changelists.css" />
+  <style>
+    dt {
+        width: 15em;
+        padding: .5em;
+        float: left;
+        margin: 0;
+        font-weight: bold;
+        clear:left;
+    }
+    dd {
+        margin-left: 16em;
+        padding: .5em;
+    }
+    table#changes_list {
+        table-layout:fixed;
+    }
+    td {
+        overflow: hidden;
+        white-space:nowrap;
+    }
+  </style>
+{% endblock %}
+{% block bodyclass %}change-list{% endblock %}
+{% block coltype %}flex{% endblock %}
+{% block content %}
+{% if is_root %}{% endif %}
+{{ content|safe }}
+{% endblock %}

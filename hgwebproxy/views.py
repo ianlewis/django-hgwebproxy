@@ -17,7 +17,6 @@ from django.conf import settings
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 
 from hgwebproxy.proxy import HgRequestWrapper
 from hgwebproxy.utils import is_mercurial
@@ -29,18 +28,12 @@ from mercurial import hg, ui
 def repo_list(request):
     repos = Repository.objects.all()
     context = {'repos_list': repos }
-    return render_to_response("hgwebproxy/repo_list.html", context, RequestContext(request))
+    return render_to_response("admin/hgwebproxy/repo_list.html", context, RequestContext(request))
 
 def repo(request, slug, *args):
     response = HttpResponse()
-    hgr = HgRequestWrapper(request, response)
-
-    """
-    You want to specify the path to your config file here. Look
-    at `hgweb.conf.dist` for a working example.
-    """
-
     repo = get_object_or_404(Repository, slug=slug)
+    hgr = HgRequestWrapper(request, response, reponame=repo.slug, repourl=repo.get_repo_url())
 
     """
     Authenticate on all requests. To authenticate only against 'POST'
@@ -83,10 +76,16 @@ def repo(request, slug, *args):
 
     template_dir = os.path.join(os.path.dirname(__file__), 'templates')
     hgserve = hgweb(str(repo.location))
+
     hgserve.reponame = repo.slug
     hgserve.templatepath = template_dir
+
+    hgserve.repo.ui.setconfig('web', 'description', repo.description)
+    hgserve.repo.ui.setconfig('web', 'name', hgserve.reponame)
+    # encode('utf-8') FIX "decoding Unicode is not supported" exception on mercurial
+    hgserve.repo.ui.setconfig('web', 'contact', repo.owner.get_full_name().encode('utf-8') )
     hgserve.repo.ui.setconfig('web', 'style', 'monoblue_plain')
-    hgserve.repo.ui.setconfig('web', 'baseurl', reverse('repo_detail', args=[hgserve.reponame]) )
+    hgserve.repo.ui.setconfig('web', 'baseurl', repo.get_repo_url() )
     hgserve.repo.ui.setconfig('web', 'staticurl', settings.MEDIA_URL)
 
     try:
@@ -101,8 +100,8 @@ def repo(request, slug, *args):
     context = {
         'content': response.content,
         'reponame' : hgserve.reponame,
-        'slugpath': request.path.lstrip("/hg"),
-        'is_root': request.path == '/hg/',
+        'slugpath': request.path.lstrip(hgserve.config('web', 'baseurl')),
+        'is_root': request.path == hgserve.config('web', 'baseurl'),
         'repo': repo,
     }
 
@@ -118,4 +117,4 @@ def repo(request, slug, *args):
     Otherwise, send the content on to the template, for any kind
     of custom layout you want around it.
     """
-    return render_to_response("hgwebproxy/repo.html", context, RequestContext(request))
+    return render_to_response("admin/hgwebproxy/repo.html", context, RequestContext(request))

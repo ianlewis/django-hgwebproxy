@@ -3,6 +3,8 @@ import re
 import cgi
 import base64
 
+from django.core.urlresolvers import reverse
+
 class HgRequestWrapper(object):
     """
     request wrapper. The main purpose of this class
@@ -24,7 +26,7 @@ class HgRequestWrapper(object):
         >>> print response.content
         ...
     """
-    def __init__(self, request, response):
+    def __init__(self, request, response, reponame, repourl):
         """
         Expects two parameters;
 
@@ -36,7 +38,9 @@ class HgRequestWrapper(object):
         self.env = request.META
         self._response = response
         # Remove the prefix so HG will think it's running on its own.
-        self.env['PATH_INFO'] = self.env['PATH_INFO'].replace("/hg", "", 1)
+        self.env['SCRIPT_NAME'] = repourl
+        self.env['PATH_INFO'] = self.env['PATH_INFO'].replace(self.env['SCRIPT_NAME'], "", 1)
+        self.env['REPO_NAME'] = reponame
 
         # Make sure there's a content-length.
         if not self.env.has_key('CONTENT_LENGTH'):
@@ -48,6 +52,9 @@ class HgRequestWrapper(object):
         self.out = [ ]
 
         self.form = cgi.parse(self.inp, self.env, keep_blank_values=1)
+
+    def __iter__(self):
+        return iter([])
 
     def set_user(self, username):
         """
