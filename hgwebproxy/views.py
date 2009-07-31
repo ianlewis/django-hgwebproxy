@@ -101,8 +101,8 @@ def repo(request, slug, *args):
     context = {
         'content': response.content,
         'reponame' : hgserve.reponame,
-        'slugpath': request.path.lstrip(hgserve.config('web', 'baseurl')),
-        'is_root': request.path == hgserve.config('web', 'baseurl'),
+        'slugpath': request.path.replace(repo.get_repo_url(), ''),
+        'is_root': request.path == repo.get_repo_url(),
         'repo': repo,
     }
 

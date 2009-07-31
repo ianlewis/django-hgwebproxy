@@ -40,7 +40,6 @@ class HgRequestWrapper(object):
         # Remove the prefix so HG will think it's running on its own.
         self.env['SCRIPT_NAME'] = repourl
         self.env['PATH_INFO'] = self.env['PATH_INFO'].replace(self.env['SCRIPT_NAME'], "", 1)
-        self.env['REPO_NAME'] = reponame
 
         # Make sure there's a content-length.
         if not self.env.has_key('CONTENT_LENGTH'):
