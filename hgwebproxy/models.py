@@ -10,8 +10,8 @@ class Repository(models.Model):
     location = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
 
-    # TODO
-    #allow_archive = models.CharField(max_length=100, blank=True, null=True)
+    allow_archive = models.CharField(max_length=100, blank=True, null=True,
+        help_text="Same as in hgrc config, as: zip, bz2, gz")
 
     class Meta:
         verbose_name = 'repository'

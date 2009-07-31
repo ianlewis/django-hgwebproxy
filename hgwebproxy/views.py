@@ -84,6 +84,7 @@ def repo(request, slug, *args):
     hgserve.repo.ui.setconfig('web', 'name', hgserve.reponame)
     # encode('utf-8') FIX "decoding Unicode is not supported" exception on mercurial
     hgserve.repo.ui.setconfig('web', 'contact', repo.owner.get_full_name().encode('utf-8') )
+    hgserve.repo.ui.setconfig('web', 'allow_archive', repo.allow_archive)
     hgserve.repo.ui.setconfig('web', 'style', 'monoblue_plain')
     hgserve.repo.ui.setconfig('web', 'baseurl', repo.get_repo_url() )
     hgserve.repo.ui.setconfig('web', 'staticurl', settings.MEDIA_URL)
