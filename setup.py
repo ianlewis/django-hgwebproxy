@@ -7,7 +7,7 @@ setup(
     long_description=open('README').read(),
     author='',
     author_email='',
-    url='http://bitbucket.org/mariocesar/hgweproxy/',
+    url='http://bitbucket.org/mariocesar/django-hgweproxy/',
     install_requires=(
         'mercurial>=1.0',
         'django>=1.0',
