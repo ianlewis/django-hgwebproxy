@@ -74,10 +74,6 @@ setup(
     author='Mario César Señoranis Ayala',
     author_email='mariocesar.sa@openit.com.bo',
     url='http://bitbucket.org/mariocesar/django-hgweproxy/',
-    install_requires=(
-        'mercurial>=1.0',
-        'django>=1.0',
-    ),
     packages = packages,
     cmdclass = cmdclasses,
     data_files = data_files,
@@ -95,5 +91,4 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
     ],
-    zip_safe=False,
 )

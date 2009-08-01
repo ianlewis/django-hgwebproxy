@@ -3,3 +3,4 @@ include README
 include AUTHORS
 recursive-include example *
 recursive-include docs *
+recursive-include hgwebproxy/templates *
