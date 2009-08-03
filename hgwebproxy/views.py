@@ -79,7 +79,8 @@ def repo(request, slug, *args):
     hgserve = hgweb(str(repo.location))
 
     hgserve.reponame = repo.slug
-    hgserve.templatepath = template_dir
+    # TODO: A more flexible way to get the default template path of mercurial
+    hgserve.templatepath = (template_dir, '/usr/share/mercurial/templates')
 
     hgserve.repo.ui.setconfig('web', 'description', repo.description)
     hgserve.repo.ui.setconfig('web', 'name', hgserve.reponame)
