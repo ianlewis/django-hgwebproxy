@@ -21,6 +21,7 @@ from django.contrib.auth.models import User
 from hgwebproxy.proxy import HgRequestWrapper
 from hgwebproxy.utils import is_mercurial
 from hgwebproxy.models import Repository
+from hgwebproxy.settings import *
 
 from mercurial.hgweb import hgwebdir, hgweb
 from mercurial import hg, ui
@@ -45,7 +46,7 @@ def repo(request, slug, *args):
     can push.
     """
     #if request.method == "POST":
-    realm = 'Basic Auth' # Change if you want.
+    realm = AUTH_REALM # Change if you want.
 
     if is_mercurial(request):
         # This is a request by a mercurial user
@@ -60,7 +61,7 @@ def repo(request, slug, *args):
 
     if not authed:
         response.status_code = 401
-        response['WWW-Authenticate'] = '''Basic realm="%s"''' % realm
+        response['WWW-Authenticate'] = '''%s="%s"''' % (AUTH_REALM, realm)
         return response
     else:
         hgr.set_user(authed)
@@ -87,7 +88,7 @@ def repo(request, slug, *args):
     hgserve.repo.ui.setconfig('web', 'allow_archive', repo.allow_archive)
     hgserve.repo.ui.setconfig('web', 'style', 'monoblue_plain')
     hgserve.repo.ui.setconfig('web', 'baseurl', repo.get_repo_url() )
-    hgserve.repo.ui.setconfig('web', 'staticurl', settings.MEDIA_URL)
+    hgserve.repo.ui.setconfig('web', 'staticurl', STATIC_URL)
 
     try:
         response.write(''.join([each for each in hgserve.run_wsgi(hgr)]))
