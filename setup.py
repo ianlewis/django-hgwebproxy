@@ -1,7 +1,8 @@
-# -*- coding:utf8 -*-
-from distutils.core import setup
 from distutils.command.install_data import install_data
 from distutils.command.install import INSTALL_SCHEMES
+
+from setuptools import setup
+
 import os
 import sys
 
@@ -51,7 +52,7 @@ if root_dir != '':
     os.chdir(root_dir)
 hgwebproxy = 'hgwebproxy'
 
-for dirpath, dirnames, filenames in os.walk(hgwebproxy):
+for dirpath, dirnames, filenames in os.walk('hgwebproxy'):
     # Ignore dirnames that start with '.'
     for i, dirname in enumerate(dirnames):
         if dirname.startswith('.'): del dirnames[i]
@@ -68,10 +69,10 @@ if len(sys.argv) > 1 and sys.argv[1] == 'bdist_wininst':
 
 setup(
     name='django-hgwebproxy',
-    version='0.1.0',
+    version='0.1.9',
     description='Django-hgwebproxy is an app to use and manage mercurial repositories within the django admin interface',
     long_description=open('README').read(),
-    author='Mario César Señoranis Ayala',
+    author='Mario C&Atilde;&copy;sar Se&Atilde;&plusmn;oranis Ayala',
     author_email='mariocesar.sa@openit.com.bo',
     url='http://bitbucket.org/mariocesar/django-hgweproxy/',
     packages = packages,
@@ -92,5 +93,4 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
     ],
-    zip_safe=True,
 )
