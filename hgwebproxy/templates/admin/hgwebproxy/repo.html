@@ -23,7 +23,7 @@
 {% block extrastyle %}
   {{ block.super }}
   <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/changelists.css" />
-  <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}style-monoblue.css" />
+  <link rel="stylesheet" type="text/css" href="{{ static_url }}style-monoblue.css" />
 {% endblock %}
 {% block bodyclass %}change-list{% endblock %}
 {% block coltype %}flex{% endblock %}

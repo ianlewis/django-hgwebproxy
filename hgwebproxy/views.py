@@ -61,7 +61,7 @@ def repo(request, slug, *args):
 
     if not authed:
         response.status_code = 401
-        response['WWW-Authenticate'] = '''%s="%s"''' % (AUTH_REALM, realm)
+        response['WWW-Authenticate'] = '''Basic realm="%s"''' % realm
         return response
     else:
         hgr.set_user(authed)
@@ -102,6 +102,7 @@ def repo(request, slug, *args):
     context = {
         'content': response.content,
         'reponame' : hgserve.reponame,
+        'static_url' : STATIC_URL,
         'slugpath': request.path.replace(repo.get_repo_url(), ''),
         'is_root': request.path == repo.get_repo_url(),
         'repo': repo,
