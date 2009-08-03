@@ -38,14 +38,23 @@ def basic_auth(request, realm):
     user = authenticate(username=username, password=password)
 
     if user:
+
+        # If the user is superuser, give all privileges
         if user.is_superuser:
             return username
 
+        # If the repository is own by the user, give all privileges
+        if reponame in [repo.slug for repo in user.repository_set.all()]:
+            return username
+
+        # In push ask if user has permission to push or pull to a repo
         if request.method == "POST":
             if user.has_perm('hgwebproxy.can_push'):
                 return username
         else:
             if user.has_perm('hgwebproxy.can_pull'):
                 return username
+
+        #TODO: Add user permissions for an especific repository
 
     return False

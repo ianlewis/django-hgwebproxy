@@ -50,7 +50,7 @@ def repo(request, slug, *args):
 
     if is_mercurial(request):
         # This is a request by a mercurial user
-        authed = basic_auth(request, realm)
+        authed = basic_auth(request, realm, repo.slug)
     else:
         # This is a standard web request
         if not request.user.is_authenticated():
