@@ -69,7 +69,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'bdist_wininst':
 
 setup(
     name='django-hgwebproxy',
-    version='0.1.9',
+    version='0.2.0',
     description='Django-hgwebproxy is an app to use and manage mercurial repositories within the django admin interface',
     long_description=open('README').read(),
     author='Mario C&Atilde;&copy;sar Se&Atilde;&plusmn;oranis Ayala',
