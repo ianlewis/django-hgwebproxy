@@ -19,7 +19,7 @@ from django.template import RequestContext
 from django.contrib.auth.models import User
 
 from hgwebproxy.proxy import HgRequestWrapper
-from hgwebproxy.utils import is_mercurial
+from hgwebproxy.utils import is_mercurial, basic_auth
 from hgwebproxy.models import Repository
 from hgwebproxy.settings import *
 
