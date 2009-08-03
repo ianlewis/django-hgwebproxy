@@ -45,7 +45,7 @@ def repo(request, slug, *args):
     repositories are readable by anyone. but only authenticated users
     can push.
     """
-    #if request.method == "POST":
+
     realm = AUTH_REALM # Change if you want.
 
     if is_mercurial(request):

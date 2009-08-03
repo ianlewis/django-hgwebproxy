@@ -35,8 +35,17 @@ def basic_auth(request, realm):
 
     _, basic_hash = auth_string.split(' ', 1)
     username, password = basic_hash.decode('base64').split(':', 1)
+    user = authenticate(username=username, password=password)
 
-    if authenticate(username=username, password=password):
-        return username
+    if user:
+        if user.is_superuser:
+            return username
+
+        if request.method == "POST":
+            if user.has_perm('hgwebproxy.can_push'):
+                return username
+        else:
+            if user.has_perm('hgwebproxy.can_pull'):
+                return username
 
     return False
