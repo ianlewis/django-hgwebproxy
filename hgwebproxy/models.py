@@ -17,7 +17,10 @@ class Repository(models.Model):
         verbose_name = 'repository'
         verbose_name_plural = 'repositories'
         ordering = ['name',]
-        permissions = (("can_push", "can_pull"),)
+        permissions = (
+            ("can_push", "Can Push"),
+            ("can_pull", "Can Pull"),
+        )
 
     def __unicode__(self):
         return u'%s' % self.name
