@@ -1,0 +1,13 @@
+syntax: glob
+*.orig
+*.rej
+*~
+*.bak
+*.marks
+*.o
+*.pyc
+*.swp
+django_hgwebproxy.egg-info
+
+syntax: regexp
+.*\#.*\#$ 
