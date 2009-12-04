@@ -1,6 +1,6 @@
 from django.db import models
+from django.db.models import permalink
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 
 class Repository(models.Model):
     name = models.CharField(max_length=140)
@@ -25,8 +25,11 @@ class Repository(models.Model):
     def __unicode__(self):
         return u'%s' % self.name
 
-    def get_repo_url(self):
-        return reverse('repo_detail', args=[self.slug])
+    @permalink
+    def get_admin_explore_url(self):
+        return ('admin:hgwebproxy_repository_explore', (), {
+            'id': self.id,
+        })
 
-    def get_absolute_url(self):
-        return self.get_repo_url()
+    #def get_absolute_url(self):
+    #    return self.get_repo_url()

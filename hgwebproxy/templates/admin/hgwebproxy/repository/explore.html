@@ -1,0 +1,27 @@
+{% extends "admin/base_site.html" %}
+{% load i18n adminmedia %}
+{% block title %}
+	{{ original.name }} :: {{ slugpath }}
+{% endblock %}
+
+{% block breadcrumbs %}{% if not is_popup %}
+<div class="breadcrumbs">
+     <a href="../../../">{% trans "Home" %}</a> &rsaquo;
+     <a href="../../">{{ app_label|capfirst|escape }}</a> &rsaquo; 
+     {% if has_change_permission %}<a href="../">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %} &rsaquo; 
+    <a href=".">{{ original|truncatewords:"18" }}</a> &rsaquo;
+    {% trans "Explore" %}
+</div>
+{% endif %}{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/changelists.css" />
+  <link rel="stylesheet" type="text/css" href="{{ static_url }}style-monoblue.css" />
+{% endblock %}
+{% block bodyclass %}change-list{% endblock %}
+{% block coltype %}flex{% endblock %}
+{% block content %}
+{% if is_root %}{% endif %}
+{{ content|safe }}
+{% endblock %}
