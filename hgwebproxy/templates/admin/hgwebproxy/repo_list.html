@@ -1,7 +1,7 @@
 {% extends "admin/index.html" %}
 {% load i18n humanize %}
 
-{% block title %}Repository List{% endblock %}
+{% block title %}{% trans "Repository List" %}{% endblock %}
 {% block extrastyle %}
 {{block.super}}
 <style>
@@ -16,19 +16,19 @@
         {% trans "Home" %}
       </a>
        &rsaquo;
-       Repo List
+      {% trans "Repository List" %}
     </div>
   {% endblock %}
 {% endif %}
 {% block sidebar %}{% endblock %}
 {% block bodyclass%}dashboard{% endblock %}
 {% block content %}
-<h1>Lista de repositorios</h1>
+<h1>{% trans "Repository List" %}</h1>
 <div id="content-main">
     <div class="module">
         <table>
             <caption>
-                Proyectos
+              {% trans "Projects" %}
             </caption>
             <tbody>
             {% for repo in repos_list %}
