@@ -11,15 +11,16 @@
             <li><a href="{url}tags{sessionvars%urlparameter}">tags</a></li>
             <li><a href="{url}file/{node|short}{path|urlescape}{sessionvars%urlparameter}">files</a></li>
         </ul>
+        <br class="clear"/>
+        <ul class="object-tools" style="margin-top:-2em">
+            <li><a href="{url}file/{node|short}/{file|urlescape}{sessionvars%urlparameter}">file</a></li>
+            <li><a href="{url}log/{node|short}/{file|urlescape}{sessionvars%urlparameter}">revisions</a></li>
+            <li><a href="{url}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}">annotate</a></li>
+            <li class="current"><a href="{url}diff/{node|short}/{file|urlescape}{sessionvars%urlparameter}">diff</a></li>
+            <li><a href="{url}raw-diff/{node|short}/{file|urlescape}">raw</a></li>
+        </ul>
     </div>
 
-    <ul class="object-tools">
-        <li><a href="{url}file/{node|short}/{file|urlescape}{sessionvars%urlparameter}">file</a></li>
-        <li><a href="{url}log/{node|short}/{file|urlescape}{sessionvars%urlparameter}">revisions</a></li>
-        <li><a href="{url}annotate/{node|short}/{file|urlescape}{sessionvars%urlparameter}">annotate</a></li>
-        <li class="current"><a href="{url}diff/{node|short}/{file|urlescape}{sessionvars%urlparameter}">diff</a></li>
-        <li><a href="{url}raw-diff/{node|short}/{file|urlescape}">raw</a></li>
-    </ul>
     <div class="module">
     <h2 class="no-link no-border">diff: {file|escape}</h2>
     <h3 class="changeset">{file|escape}</h3>

@@ -9,7 +9,13 @@
             <li class="current"><a href="{url}log{sessionvars%urlparameter}">changelog</a></li>
             <li><a href="{url}graph/{node|short}{sessionvars%urlparameter}">graph</a></li>
             <li><a href="{url}tags{sessionvars%urlparameter}">tags</a></li>
-            <li><a href="{url}file/#node|short#{sessionvars%urlparameter}">files</a>#archives%archiveentry#</li>
+            <li><a href="{url}file/#node|short#{sessionvars%urlparameter}">files</a></li>
+        </ul>
+        <br class="clear"/>
+        <ul class="object-tools" style="margin-top:-2em">
+            <li class="current"><a href="{url}rev/#node|short#">changeset</a></li>
+            <li><a href="{url}raw-rev/#node|short#">raw</a> </li>
+            #archives%archiveentry#
         </ul>
     </div>
 

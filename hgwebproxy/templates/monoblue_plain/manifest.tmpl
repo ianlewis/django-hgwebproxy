@@ -11,12 +11,12 @@
             <li><a href="{url}tags{sessionvars%urlparameter}">tags</a></li>
             <li class="current"><a href="{url}file/#node|short#{sessionvars%urlparameter}">files</a></li>
         </ul>
+        <br class="clear"/>
+        <ul class="object-tools" style="margin-top:-2em">
+            <li><a href="{url}rev/#node|short#{sessionvars%urlparameter}">changeset</a></li>
+            #archives%archiveentry#
+        </ul>
     </div>
-
-    <ul class="object-tools" class="submenu">
-        <li><a href="{url}rev/#node|short#{sessionvars%urlparameter}">changeset</a> #archives%archiveentry#</li>
-        {archives%archiveentry}
-    </ul>
 
     <div class="module">
         <h2>files</h2>

@@ -108,7 +108,7 @@ class RepositoryAdmin(admin.ModelAdmin):
             'content': response.content,
             'reponame' : hgserve.reponame,
             'static_url' : STATIC_URL,
-            'slugpath': request.path.replace(repo.get_admin_explore_url(), ''),
+            'slugpath': request.path.replace(repo.get_admin_explore_url(), '') or 'summary',
             'is_root': request.path == repo.get_admin_explore_url(),
         }
 
