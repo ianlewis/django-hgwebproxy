@@ -10,7 +10,6 @@ from django.contrib.auth.models import User
 from django.contrib import admin
 
 from hgwebproxy.proxy import HgRequestWrapper
-from hgwebproxy.utils import is_mercurial, basic_auth
 from hgwebproxy.models import Repository
 from hgwebproxy.settings import *
 
@@ -35,36 +34,7 @@ class RepositoryAdmin(admin.ModelAdmin):
             reponame=repo.slug,
             repourl=repo.get_admin_explore_url(),
         )
-
-        """
-        Authenticate on all requests. To authenticate only against 'POST'
-        requests, uncomment the line below the comment.
-
-        Currently, repositories are only viewable by authenticated users.
-        If authentication is only done on 'POST' request, then
-        repositories are readable by anyone. but only authenticated users
-        can push.
-        """
-
-        realm = AUTH_REALM # Change if you want.
-
-        if is_mercurial(request):
-            # This is a request by a mercurial user
-            authed = basic_auth(request, realm, repo.slug)
-        else:
-            # This is a standard web request
-            if not request.user.is_authenticated():
-                return HttpResponseRedirect('%s?next=%s' %
-                                            (settings.LOGIN_URL,request.path))
-            else:
-                authed = request.user.username
-
-        if not authed:
-            response.status_code = 401
-            response['WWW-Authenticate'] = '''Basic realm="%s"''' % realm
-            return response
-        else:
-            hgr.set_user(authed)
+        hgr.set_user(request.user.username)
 
         """
         Run the `hgwebdir` method from Mercurial directly, with

@@ -71,22 +71,32 @@ class HgRequestWrapper(object):
         """
         return None
 
+    _responded=False
     def respond(self, code, content_type=None, path=None, length=0):
         """
         `hgweb` uses this for headers, and is necessary to have things
         like "Download tarball" working.
         """
-        self._response.status_code = code
 
-        self._response['content-type'] = content_type
+        # Ignore respond calls after the first call since
+        # correct behavior for wsgi response objects is respond
+        # with the headers at this point and ignore subsequent calls.
+        # hgweb sometimes calls respond multiple times which 
+        # would cause incorrect headers to get set.
+        if not self._responded:
+            self._response.status_code = code
 
-        if path is not None and length is not None:
             self._response['content-type'] = content_type
-            self._response['content-length'] = length
-            self._response['content-disposition'] = 'inline; filename=%s' % path
 
-        for directive, value in self.headers:
-            self._response[directive.lower()] = value
+            if path is not None and length is not None:
+                self._response['content-type'] = content_type
+                self._response['content-length'] = length
+                self._response['content-disposition'] = 'inline; filename=%s' % path
+
+            for directive, value in self.headers:
+                self._response[directive.lower()] = value
+
+            self._responded = True
 
     def header(self, headers=[('Content-Type','text/html')]):
         """
