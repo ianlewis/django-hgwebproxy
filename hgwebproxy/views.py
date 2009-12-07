@@ -72,8 +72,8 @@ def repo_detail(request, slug, *args):
 
     hgserve.reponame = repo.slug
 
-    if TEMPLATE_PATH is not None:
-        hgserve.templatepath = (template_dir, '/usr/share/mercurial/templates')
+    if TEMPLATE_PATHS is not None:
+        hgserve.templatepath = TEMPLATE_PATHS 
 
     hgserve.repo.ui.setconfig('web', 'description', repo.description)
     hgserve.repo.ui.setconfig('web', 'name', hgserve.reponame)
