@@ -72,9 +72,8 @@ def repo_detail(request, slug, *args):
 
     hgserve.reponame = repo.slug
 
-    # TODO: A more flexible way to get the default template path of mercurial
-    # Allow users to set this in the admin?
-    #hgserve.templatepath = (template_dir, '/usr/share/mercurial/templates')
+    if TEMPLATE_PATH is not None:
+        hgserve.templatepath = (template_dir, '/usr/share/mercurial/templates')
 
     hgserve.repo.ui.setconfig('web', 'description', repo.description)
     hgserve.repo.ui.setconfig('web', 'name', hgserve.reponame)
@@ -84,8 +83,9 @@ def repo_detail(request, slug, *args):
     hgserve.repo.ui.setconfig('web', 'style', 'coal')
     hgserve.repo.ui.setconfig('web', 'baseurl', repo.get_absolute_url() )
 
-    #TODO: Allow serving static content from a seperate URL
-    #hgserve.repo.ui.setconfig('web', 'staticurl', STATIC_URL)
+    #Allow serving static content from a seperate URL
+    if not settings.DEBUG:  
+        hgserve.repo.ui.setconfig('web', 'staticurl', STATIC_URL)
 
     # Allow hgweb errors to propagate
     response.write(''.join([each for each in hgserve.run_wsgi(hgr)]))
