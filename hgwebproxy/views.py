@@ -84,7 +84,7 @@ def repo_detail(request, slug, *args):
     hgserve.repo.ui.setconfig('web', 'baseurl', repo.get_absolute_url() )
 
     #Allow serving static content from a seperate URL
-    if not settings.DEBUG:  
+    if not settings.DEBUG:
         hgserve.repo.ui.setconfig('web', 'staticurl', STATIC_URL)
 
     # Allow hgweb errors to propagate
