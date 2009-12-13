@@ -26,7 +26,7 @@ class HgRequestWrapper(object):
         >>> print response.content
         ...
     """
-    def __init__(self, request, response, reponame, repourl):
+    def __init__(self, request, response, script_name):
         """
         Expects two parameters;
 
@@ -38,7 +38,7 @@ class HgRequestWrapper(object):
         self.env = request.META
         self._response = response
         # Remove the prefix so HG will think it's running on its own.
-        self.env['SCRIPT_NAME'] = repourl
+        self.env['SCRIPT_NAME'] = script_name 
         self.env['PATH_INFO'] = self.env['PATH_INFO'].replace(self.env['SCRIPT_NAME'], "", 1)
 
         # Make sure there's a content-length.

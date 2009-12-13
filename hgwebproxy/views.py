@@ -9,23 +9,132 @@ from hgwebproxy.utils import is_mercurial, basic_auth
 from hgwebproxy.models import Repository
 from hgwebproxy.settings import *
 
-from mercurial.hgweb import hgwebdir, hgweb
-from mercurial import hg, ui
-
+from mercurial.hgweb import hgwebdir, hgweb, common, webutil
+from mercurial import ui, hg, util, templater
+from mercurial import error, encoding
 
 """
 Simple Django view code that proxies requests through
 to `hgweb` and handles authentication on `POST` up against
 Djangos own built in authentication layer.
 """
-def repo_detail(request, slug, *args):
+
+def repo_list(request, pattern):
+    # Handle repo_detail
+    slug = pattern.split('/')[0]
+    try:
+        repo = Repository.objects.get(slug=slug)
+        return repo_detail(request, repo)
+    except Repository.DoesNotExist:
+        pass
+
+    u = ui.ui()
+    u.setconfig('ui', 'report_untrusted', 'off')
+    u.setconfig('ui', 'interactive', 'off')
     response = HttpResponse()
-    repo = get_object_or_404(Repository, slug=slug)
+
+    #TODO: Is this right?
+    url = request.path
+    if not url.endswith('/'):
+        url += '/'
+
+    def header(**map):
+        yield tmpl('header', encoding=encoding.encoding, **map)
+
+    def footer(**map):
+        yield tmpl("footer", **map)
+
+    def motd(**map):
+        yield "" 
+
+    def archivelist(ui, nodeid, url):
+        # TODO: support archivelist
+        if 1 == 2:  
+            yield ""
+
+    def entries(sortcolumn="", descending=False, subdir="", **map):
+        #TODO: Support sort and parity
+        #TODO: Support permissions
+        repos = Repository.objects.all()
+        for repo in repos: 
+            contact = repo.owner.get_full_name().encode('utf-8') 
+
+            lastchange = (common.get_mtime(repo.location), util.makedate()[1])
+             
+            row = dict(contact=contact or "unknown",
+                       contact_sort=contact.upper() or "unknown",
+                       name=repo.name,
+                       name_sort=repo.name,
+                       url=repo.get_absolute_url(),
+                       description=repo.description or "unknown",
+                       description_sort=repo.description.upper() or "unknown",
+                       lastchange=lastchange,
+                       lastchange_sort=lastchange[1]-lastchange[0],
+                       archives=archivelist(u, "tip", url))
+            yield row
+
+    if settings.DEBUG:
+        # Handle static files 
+        if pattern.startswith("static/"): 
+            static = templater.templatepath('static')
+            fname = pattern[7:]
+            req = HgRequestWrapper(
+                request,
+                response,
+                script_name=url,
+            )
+            response.write(''.join([each for each in (common.staticfile(static, fname, req))]))
+            return response
+
+    defaultstaticurl = url + 'static/'
+    staticurl = STATIC_URL or defaultstaticurl if not settings.DEBUG else defaultstaticurl 
+
+    if TEMPLATE_PATHS is not None:
+        hgserve.templatepath = TEMPLATE_PATHS 
+
+    #TODO: clean this up
+    vars = {}
+    #TODO: Support setting the style
+    style = "coal"
+    #style = self.style
+    #if 'style' in req.form:
+    #    vars['style'] = style = req.form['style'][0]
+    start = url[-1] == '?' and '&' or '?'
+
+    sessionvars = webutil.sessionvars(vars, start)
+    
+    mapfile = templater.stylemap(style)
+    tmpl = templater.templater(mapfile,
+                               defaults={"header": header,
+                                         "footer": footer,
+                                         "motd": motd,
+                                         "url": url,
+                                         "staticurl": staticurl,
+                                         "sessionvars": sessionvars})
+
+    #TODO: Add support for descending, sortcolumn etc.
+    sortdefault = 'name', False
+    sortcolumn, descending = sortdefault
+    sortable = ["name", "description", "contact", "lastchange"]
+    sort = [("sort_%s" % column,
+             "%s%s" % ((not descending and column == sortcolumn)
+                        and "-" or "", column))
+            for column in sortable]
+
+    chunks = tmpl("index", entries=entries, subdir="",
+                    sortcolumn=sortcolumn, descending=descending,
+                    **dict(sort))
+    
+    for chunk in chunks:
+        response.write(chunk)
+    return response
+
+def repo_detail(request, repo):
+    response = HttpResponse()
     hgr = HgRequestWrapper(
         request,
         response,
-        reponame=repo.slug,
-        repourl=repo.get_absolute_url(),
+        script_name=repo.get_absolute_url(),
     )
 
     """
@@ -80,6 +189,7 @@ def repo_detail(request, slug, *args):
     # encode('utf-8') FIX "decoding Unicode is not supported" exception on mercurial
     hgserve.repo.ui.setconfig('web', 'contact', repo.owner.get_full_name().encode('utf-8') )
     hgserve.repo.ui.setconfig('web', 'allow_archive', repo.allow_archive)
+    # TODO: Support setting the style
     hgserve.repo.ui.setconfig('web', 'style', 'coal')
     hgserve.repo.ui.setconfig('web', 'baseurl', repo.get_absolute_url() )
 

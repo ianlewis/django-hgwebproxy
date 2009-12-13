@@ -34,6 +34,6 @@ class Repository(models.Model):
 
     @permalink
     def get_absolute_url(self):
-        return ('repo_detail', (), {
-            'slug': self.slug,
+        return ('repo_list', (), {
+            'pattern': self.slug + "/",
         })
