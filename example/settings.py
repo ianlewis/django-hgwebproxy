@@ -96,7 +96,6 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'django.contrib.admindocs',
     'hgwebproxy',
-    'authority',
 )
 
 HG_CONFIG_WEBDIR = os.path.join(BASE_DIR, 'example', 'hgweb.conf')

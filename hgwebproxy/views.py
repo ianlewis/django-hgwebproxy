@@ -1,15 +1,14 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render_to_response, get_object_or_404
+from django.utils.translation import ugettext as _
+from django.conf import settings
 
 from django.contrib.auth.models import User
-
-from authority.decorators import permission_required_or_403
 
 from hgwebproxy.proxy import HgRequestWrapper
 from hgwebproxy.utils import is_mercurial, basic_auth
 from hgwebproxy.models import Repository
-from hgwebproxy.permissions import RepositoryPermission
 from hgwebproxy.settings import *
 
 from mercurial.hgweb import hgwebdir, hgweb, common, webutil
@@ -58,10 +57,9 @@ def repo_list(request, pattern):
     def entries(sortcolumn="", descending=False, subdir="", **map):
         #TODO: Support sort and parity
         #TODO: Support permissions
-        perm = RepositoryPermission(request.user)
         repos = Repository.objects.all()
         for repo in repos:
-            if perm.browse_repository(repo): 
+            if repo.can_browse(request.user): 
                 contact = repo.owner.get_full_name().encode('utf-8') 
 
                 lastchange = (common.get_mtime(repo.location), util.makedate()[1])
@@ -134,8 +132,6 @@ def repo_list(request, pattern):
         response.write(chunk)
     return response
 
-@permission_required_or_403('repository_permission.browse_repository',
-    (Repository, 'slug__iexact', 'slug'))
 def repo_detail(request, slug):
     repo = get_object_or_404(Repository, slug=slug)
     response = HttpResponse()
@@ -159,14 +155,18 @@ def repo_detail(request, slug):
 
     if is_mercurial(request):
         # This is a request by a mercurial user
-        authed = basic_auth(request, realm, repo.slug)
+        authed = basic_auth(request, realm, repo)
     else:
         # This is a standard web request
-        if not request.user.is_authenticated():
-            return HttpResponseRedirect('%s?next=%s' %
-                                        (settings.LOGIN_URL,request.path))
-        else:
-            authed = request.user.username
+        if not repo.can_browse(request.user):
+            raise PermissionDenied(_("You do not have access to this repository"))
+        authed = request.user.username
+
+        #if not request.user.is_authenticated():
+        #    return HttpResponseRedirect('%s?next=%s' %
+        #                                (settings.LOGIN_URL,request.path))
+        #else:
+        #    authed = request.user.username
 
     if not authed:
         response.status_code = 401
@@ -200,10 +200,17 @@ def repo_detail(request, slug):
     # TODO: Support setting the style
     hgserve.repo.ui.setconfig('web', 'style', 'coal')
     hgserve.repo.ui.setconfig('web', 'baseurl', repo.get_absolute_url() )
+    # Allow push to the current user
+    hgserve.repo.ui.setconfig('web', 'allow_push', authed)
 
     #Allow serving static content from a seperate URL
     if not settings.DEBUG:
         hgserve.repo.ui.setconfig('web', 'staticurl', STATIC_URL)
+
+    if settings.DEBUG:
+        # Allow pushing in using http when debugging
+        # TODO: Add a setting for push_ssl
+        hgserve.repo.ui.setconfig('web', 'push_ssl', 'false')
 
     # Allow hgweb errors to propagate
     response.write(''.join([each for each in hgserve.run_wsgi(hgr)]))

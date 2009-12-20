@@ -20,7 +20,7 @@ def is_mercurial(request):
     else:
         return False
 
-def basic_auth(request, realm, reponame):
+def basic_auth(request, realm, repo):
     """
     Very simple Basic authentication handler which hooks
     up to Djangos underlying database of users directly.
@@ -44,18 +44,18 @@ def basic_auth(request, realm, reponame):
             return username
 
         # If the repository is own by the user, give all privileges
-        if reponame in [repo.slug for repo in user.repository_set.all()]:
+        if repo.owner == user:
             return username
 
         if request.method == "POST":
         #   User can push to any repo?
-            if user.has_perm('hgwebproxy.can_push'):
+            if repo.can_push(user):
                 return username
         #   User can push on this repo?
         #       yes, then return username
         else:
         #   User can pull to any repo?
-            if user.has_perm('hgwebproxy.can_pull'):
+            if repo.can_pull(user):
                 return username
         #   User can pull on this repo?
         #       yes, then return username

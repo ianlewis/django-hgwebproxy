@@ -14,17 +14,28 @@ class Repository(models.Model):
     allow_archive = models.CharField(max_length=100, blank=True, null=True,
         help_text="Same as in hgrc config, as: zip, bz2, gz")
 
-    class Meta:
-        verbose_name = _('repository')
-        verbose_name_plural = _('repositories')
-        ordering = ['name',]
-        permissions = (
-            ("can_push", "Can Push"),
-            ("can_pull", "Can Pull"),
-        )
+    readers = models.ManyToManyField(User, related_name="repository_readable_set", blank=True, null=True)
+    writers = models.ManyToManyField(User, related_name="repository_writeable_set", blank=True, null=True)
 
     def __unicode__(self):
         return u'%s' % self.name
+
+    def can_browse(self, user):
+        return user.is_superuser or \
+               user == self.owner or \
+               not not self.readers.filter(pk=user.id) or \
+               not not self.writers.filter(pk=user.id) 
+
+    def can_pull(self, user):
+        return user.is_superuser or \
+               user == self.owner or \
+               not not self.readers.filter(pk=user.id) or \
+               not not self.writers.filter(pk=user.id)
+
+    def can_push(self, user):
+        return user.is_superuser or \
+               user == self.owner or \
+               not not self.writers.filter(pk=user.id)
 
     @permalink
     def get_admin_explore_url(self):
@@ -37,3 +48,14 @@ class Repository(models.Model):
         return ('repo_list', (), {
             'pattern': self.slug + "/",
         })
+
+    class Meta:
+        verbose_name = _('repository')
+        verbose_name_plural = _('repositories')
+        ordering = ['name',]
+        permissions = (
+            ("can_push", "Can Push"),
+            ("can_pull", "Can Pull"),
+        )
+
+

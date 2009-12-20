@@ -21,6 +21,7 @@ class RepositoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {
         'slug': ('name',)
     }
+    filter_horizontal = ('readers','writers')
 
     def explore(self, request, id, *args):
         opts = self.model._meta
