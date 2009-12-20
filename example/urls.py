@@ -11,6 +11,7 @@ urlpatterns = patterns('',
         {'template_name':'registration/login.html'}, name='login'),
     url(r'^logout/$', 'django.contrib.auth.views.logout',
         {'template_name':'registration/logout.html'}, name='logout'),
+    (r'', include('hgwebproxy.urls')),
 )
 
 from django.conf import settings

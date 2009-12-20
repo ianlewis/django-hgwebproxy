@@ -4,9 +4,12 @@ from django.shortcuts import render_to_response, get_object_or_404
 
 from django.contrib.auth.models import User
 
+from authority.decorators import permission_required_or_403
+
 from hgwebproxy.proxy import HgRequestWrapper
 from hgwebproxy.utils import is_mercurial, basic_auth
 from hgwebproxy.models import Repository
+from hgwebproxy.permissions import RepositoryPermission
 from hgwebproxy.settings import *
 
 from mercurial.hgweb import hgwebdir, hgweb, common, webutil
@@ -24,7 +27,7 @@ def repo_list(request, pattern):
     slug = pattern.split('/')[0]
     try:
         repo = Repository.objects.get(slug=slug)
-        return repo_detail(request, repo)
+        return repo_detail(request, slug=slug)
     except Repository.DoesNotExist:
         pass
 
@@ -55,23 +58,25 @@ def repo_list(request, pattern):
     def entries(sortcolumn="", descending=False, subdir="", **map):
         #TODO: Support sort and parity
         #TODO: Support permissions
+        perm = RepositoryPermission(request.user)
         repos = Repository.objects.all()
-        for repo in repos: 
-            contact = repo.owner.get_full_name().encode('utf-8') 
+        for repo in repos:
+            if perm.browse_repository(repo): 
+                contact = repo.owner.get_full_name().encode('utf-8') 
 
-            lastchange = (common.get_mtime(repo.location), util.makedate()[1])
-             
-            row = dict(contact=contact or "unknown",
-                       contact_sort=contact.upper() or "unknown",
-                       name=repo.name,
-                       name_sort=repo.name,
-                       url=repo.get_absolute_url(),
-                       description=repo.description or "unknown",
-                       description_sort=repo.description.upper() or "unknown",
-                       lastchange=lastchange,
-                       lastchange_sort=lastchange[1]-lastchange[0],
-                       archives=archivelist(u, "tip", url))
-            yield row
+                lastchange = (common.get_mtime(repo.location), util.makedate()[1])
+                 
+                row = dict(contact=contact or "unknown",
+                           contact_sort=contact.upper() or "unknown",
+                           name=repo.name,
+                           name_sort=repo.name,
+                           url=repo.get_absolute_url(),
+                           description=repo.description or "unknown",
+                           description_sort=repo.description.upper() or "unknown",
+                           lastchange=lastchange,
+                           lastchange_sort=lastchange[1]-lastchange[0],
+                           archives=archivelist(u, "tip", url))
+                yield row
 
     if settings.DEBUG:
         # Handle static files 
@@ -129,7 +134,10 @@ def repo_list(request, pattern):
         response.write(chunk)
     return response
 
-def repo_detail(request, repo):
+@permission_required_or_403('repository_permission.browse_repository',
+    (Repository, 'slug__iexact', 'slug'))
+def repo_detail(request, slug):
+    repo = get_object_or_404(Repository, slug=slug)
     response = HttpResponse()
     hgr = HgRequestWrapper(
         request,

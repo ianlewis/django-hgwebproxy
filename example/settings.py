@@ -24,11 +24,11 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
 # although not all choices may be available on all operating systems.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'America/La_Paz'
+TIME_ZONE = 'America/Chicago'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'es_bo'
+LANGUAGE_CODE = 'en'
 
 SITE_ID = 1
 
@@ -96,6 +96,7 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'django.contrib.admindocs',
     'hgwebproxy',
+    'authority',
 )
 
 HG_CONFIG_WEBDIR = os.path.join(BASE_DIR, 'example', 'hgweb.conf')
