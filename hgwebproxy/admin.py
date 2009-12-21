@@ -41,8 +41,7 @@ class RepositoryAdmin(admin.ModelAdmin):
         hgr = HgRequestWrapper(
             request,
             response,
-            reponame=repo.slug,
-            repourl=repo.get_admin_explore_url(),
+            script_name=repo.get_admin_explore_url(),
         )
         hgr.set_user(request.user.username)
 
