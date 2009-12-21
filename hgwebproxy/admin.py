@@ -22,6 +22,15 @@ class RepositoryAdmin(admin.ModelAdmin):
         'slug': ('name',)
     }
     filter_horizontal = ('readers','reader_groups','writers','writer_groups')
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'slug', 'owner', 'location', 'description', 'allow_archive')
+        }),
+        ('Permissions', {
+            'fields': ('readers', 'writers', 'reader_groups', 'writer_groups')
+        }),
+    )
+    
 
     def explore(self, request, id, *args):
         opts = self.model._meta
