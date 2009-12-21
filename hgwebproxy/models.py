@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models import permalink
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.utils.translation import ugettext_lazy as _
 
 class Repository(models.Model):
@@ -16,6 +16,8 @@ class Repository(models.Model):
 
     readers = models.ManyToManyField(User, related_name="repository_readable_set", blank=True, null=True)
     writers = models.ManyToManyField(User, related_name="repository_writeable_set", blank=True, null=True)
+    reader_groups = models.ManyToManyField(Group, related_name="repository_readable_set", blank=True, null=True)
+    writer_groups = models.ManyToManyField(Group, related_name="repository_writeable_set", blank=True, null=True)
 
     def __unicode__(self):
         return u'%s' % self.name
@@ -24,18 +26,24 @@ class Repository(models.Model):
         return user.is_superuser or \
                user == self.owner or \
                not not self.readers.filter(pk=user.id) or \
-               not not self.writers.filter(pk=user.id) 
+               not not self.writers.filter(pk=user.id) or \
+               not not self.reader_groups.filter(pk__in=[group.id for group in user.groups.all()]) or \
+               not not self.writer_groups.filter(pk__in=[group.id for group in user.groups.all()])
+
 
     def can_pull(self, user):
         return user.is_superuser or \
                user == self.owner or \
                not not self.readers.filter(pk=user.id) or \
-               not not self.writers.filter(pk=user.id)
+               not not self.writers.filter(pk=user.id) or \
+               not not self.reader_groups.filter(pk__in=[group.id for group in user.groups.all()]) or \
+               not not self.writer_groups.filter(pk__in=[group.id for group in user.groups.all()])
 
     def can_push(self, user):
         return user.is_superuser or \
                user == self.owner or \
-               not not self.writers.filter(pk=user.id)
+               not not self.writers.filter(pk=user.id) or \
+               not not self.writer_groups.filter(pk__in=[group.id for group in user.groups.all()])
 
     @permalink
     def get_admin_explore_url(self):
@@ -57,5 +65,3 @@ class Repository(models.Model):
             ("can_push", "Can Push"),
             ("can_pull", "Can Pull"),
         )
-
-
