@@ -61,7 +61,3 @@ class Repository(models.Model):
         verbose_name = _('repository')
         verbose_name_plural = _('repositories')
         ordering = ['name',]
-        permissions = (
-            ("can_push", "Can Push"),
-            ("can_pull", "Can Pull"),
-        )
