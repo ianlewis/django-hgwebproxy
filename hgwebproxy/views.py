@@ -66,7 +66,7 @@ def repo_list(request, pattern):
         parity = common.paritygen(stripecount)
         for repo in Repository.objects.all():
             if repo.can_browse(request.user): 
-                contact = repo.owner.get_full_name().encode('utf-8') 
+                contact = smart_str(repo.owner.get_full_name())
 
                 lastchange = (common.get_mtime(repo.location), util.makedate()[1])
                  
