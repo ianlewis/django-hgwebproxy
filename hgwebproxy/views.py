@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render_to_response, get_object_or_404
 from django.utils.translation import ugettext as _
+from django.utils.encoding import smart_str 
 from django.conf import settings
 
 from django.contrib.auth.models import User
@@ -69,11 +70,11 @@ def repo_list(request, pattern):
                  
                 row = dict(contact=contact or "unknown",
                            contact_sort=contact.upper() or "unknown",
-                           name=repo.name,
-                           name_sort=repo.name,
+                           name=smart_str(repo.name),
+                           name_sort=smart_str(repo.name),
                            url=repo.get_absolute_url(),
-                           description=repo.description or "unknown",
-                           description_sort=repo.description.upper() or "unknown",
+                           description=smart_str(repo.description) or "unknown",
+                           description_sort=smart_str(repo.description.upper()) or "unknown",
                            lastchange=lastchange,
                            lastchange_sort=lastchange[1]-lastchange[0],
                            archives=archivelist(u, "tip", url))
@@ -215,10 +216,10 @@ def repo_detail(request, slug):
     if TEMPLATE_PATHS is not None:
         hgserve.templatepath = TEMPLATE_PATHS 
 
-    hgserve.repo.ui.setconfig('web', 'description', repo.description)
-    hgserve.repo.ui.setconfig('web', 'name', hgserve.reponame)
+    hgserve.repo.ui.setconfig('web', 'description', smart_str(repo.description))
+    hgserve.repo.ui.setconfig('web', 'name', smart_str(hgserve.reponame))
     # encode('utf-8') FIX "decoding Unicode is not supported" exception on mercurial
-    hgserve.repo.ui.setconfig('web', 'contact', repo.owner.get_full_name().encode('utf-8') )
+    hgserve.repo.ui.setconfig('web', 'contact', smart_str(repo.owner.get_full_name()))
     hgserve.repo.ui.setconfig('web', 'allow_archive', repo.allow_archive)
     # TODO: Support setting the style
     hgserve.repo.ui.setconfig('web', 'style', 'coal')
