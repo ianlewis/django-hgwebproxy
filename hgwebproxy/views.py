@@ -33,6 +33,9 @@ def repo_list(request, pattern):
     u = ui.ui()
     u.setconfig('ui', 'report_untrusted', 'off')
     u.setconfig('ui', 'interactive', 'off')
+
+    #stripecount = u.config('web', 'stripes', 1)
+    stripecount = 1 
     response = HttpResponse()
 
     #TODO: Is this right?
@@ -54,11 +57,11 @@ def repo_list(request, pattern):
         if 1 == 2:  
             yield ""
 
+    sortdefault = 'name', False
     def entries(sortcolumn="", descending=False, subdir="", **map):
-        #TODO: Support sort and parity
-        #TODO: Support permissions
-        repos = Repository.objects.all()
-        for repo in repos:
+        rows = []
+        parity = common.paritygen(stripecount)
+        for repo in Repository.objects.all():
             if repo.can_browse(request.user): 
                 contact = repo.owner.get_full_name().encode('utf-8') 
 
@@ -74,6 +77,19 @@ def repo_list(request, pattern):
                            lastchange=lastchange,
                            lastchange_sort=lastchange[1]-lastchange[0],
                            archives=archivelist(u, "tip", url))
+                if (not sortcolumn or (sortcolumn, descending) == sortdefault):
+                    # fast path for unsorted output
+                    row['parity'] = parity.next()
+                    yield row
+                else:
+                    rows.append((row["%s_sort" % sortcolumn], row))
+
+        if rows:
+            rows.sort()
+            if descending:
+                rows.reverse()
+            for key, row in rows:
+                row['parity'] = parity.next()
                 yield row
 
     if settings.DEBUG:
@@ -115,10 +131,17 @@ def repo_list(request, pattern):
                                          "staticurl": staticurl,
                                          "sessionvars": sessionvars})
 
-    #TODO: Add support for descending, sortcolumn etc.
-    sortdefault = 'name', False
-    sortcolumn, descending = sortdefault
+    #Support for descending, sortcolumn etc.
     sortable = ["name", "description", "contact", "lastchange"]
+    sortcolumn, descending = sortdefault
+    if 'sort' in request.GET:
+        sortcolumn = request.GET['sort']
+        descending = sortcolumn.startswith('-')
+        if descending:
+            sortcolumn = sortcolumn[1:]
+        if sortcolumn not in sortable:
+            sortcolumn = ""
+
     sort = [("sort_%s" % column,
              "%s%s" % ((not descending and column == sortcolumn)
                         and "-" or "", column))
