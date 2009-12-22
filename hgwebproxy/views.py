@@ -23,8 +23,6 @@ Djangos own built in authentication layer.
 """
 
 def repo_list(request, pattern):
-    if REPO_LIST_REQUIRES_LOGIN and not request.user.is_authenticated():
-        return redirect(settings.LOGIN_URL) 
     # Handle repo_detail
     slug = pattern.split('/')[0]
     try:
@@ -32,6 +30,9 @@ def repo_list(request, pattern):
         return repo_detail(request, slug=slug)
     except Repository.DoesNotExist:
         pass
+
+    if REPO_LIST_REQUIRES_LOGIN and not request.user.is_authenticated():
+        return redirect(settings.LOGIN_URL) 
 
     u = ui.ui()
     u.setconfig('ui', 'report_untrusted', 'off')
