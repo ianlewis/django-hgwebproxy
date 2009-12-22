@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import redirect, render_to_response, get_object_or_404
 from django.utils.translation import ugettext as _
 from django.utils.encoding import smart_str 
 from django.conf import settings
@@ -23,6 +23,8 @@ Djangos own built in authentication layer.
 """
 
 def repo_list(request, pattern):
+    if REPO_LIST_REQUIRES_LOGIN and not request.user.is_authenticated():
+        return redirect(settings.LOGIN_URL) 
     # Handle repo_detail
     slug = pattern.split('/')[0]
     try:

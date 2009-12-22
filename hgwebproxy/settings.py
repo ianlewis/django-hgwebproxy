@@ -5,3 +5,5 @@ STATIC_URL = getattr(settings, 'HGPROXY_STATIC_URL', os.path.join(settings.MEDIA
 TEMPLATE_PATHS = getattr(settings, 'HGPROXY_TEMPLATE_PATHS', None)
 
 AUTH_REALM = getattr(settings, 'HGPROXY_AUTH_RELAM', 'Basic Auth')
+
+REPO_LIST_REQUIRES_LOGIN = getattr(settings, 'HGPROXY_REPO_LIST_REQUIRES_LOGIN', False)
