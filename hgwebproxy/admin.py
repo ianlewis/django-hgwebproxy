@@ -24,10 +24,13 @@ class RepositoryAdmin(admin.ModelAdmin):
     filter_horizontal = ('readers','reader_groups','writers','writer_groups')
     fieldsets = (
         (None, {
-            'fields': ('name', 'slug', 'owner', 'location', 'description', 'allow_archive')
+            'fields': ('name', 'slug', 'owner', 'location', 'description')
         }),
         ('Permissions', {
             'fields': ('readers', 'writers', 'reader_groups', 'writer_groups')
+        }),
+        ('Options', {
+            'fields': ('style', 'allow_archive',),
         }),
     )
     

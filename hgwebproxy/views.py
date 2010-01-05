@@ -115,18 +115,11 @@ def repo_list(request, pattern):
     if TEMPLATE_PATHS is not None:
         hgserve.templatepath = TEMPLATE_PATHS 
 
-    #TODO: clean this up
     vars = {}
-    #TODO: Support setting the style
-    style = "coal"
-    #style = self.style
-    #if 'style' in req.form:
-    #    vars['style'] = style = req.form['style'][0]
     start = url[-1] == '?' and '&' or '?'
-
     sessionvars = webutil.sessionvars(vars, start)
     
-    mapfile = templater.stylemap(style)
+    mapfile = templater.stylemap(STYLE)
     tmpl = templater.templater(mapfile,
                                defaults={"header": header,
                                          "footer": footer,
@@ -224,8 +217,8 @@ def repo_detail(request, slug):
     # encode('utf-8') FIX "decoding Unicode is not supported" exception on mercurial
     hgserve.repo.ui.setconfig('web', 'contact', smart_str(repo.owner.get_full_name()))
     hgserve.repo.ui.setconfig('web', 'allow_archive', repo.allow_archive)
-    # TODO: Support setting the style
-    hgserve.repo.ui.setconfig('web', 'style', 'coal')
+    # Set the style
+    hgserve.repo.ui.setconfig('web', 'style', repo.style or STYLE)
     hgserve.repo.ui.setconfig('web', 'baseurl', repo.get_absolute_url() )
     # Allow push to the current user
     hgserve.repo.ui.setconfig('web', 'allow_push', authed)

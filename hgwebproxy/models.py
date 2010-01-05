@@ -12,7 +12,10 @@ class Repository(models.Model):
     description = models.TextField(blank=True, null=True)
 
     allow_archive = models.CharField(max_length=100, blank=True, null=True,
-        help_text="Same as in hgrc config, as: zip, bz2, gz")
+        help_text=_("Same as in hgrc config, as: zip, bz2, gz"))
+
+    style = models.CharField(max_length=256, blank=True, null=True,
+        help_text=_('The hgweb style'))
 
     readers = models.ManyToManyField(User, related_name="repository_readable_set", blank=True, null=True)
     writers = models.ManyToManyField(User, related_name="repository_writeable_set", blank=True, null=True)
