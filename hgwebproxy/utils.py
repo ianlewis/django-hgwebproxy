@@ -13,7 +13,7 @@ def is_mercurial(request):
     """
     agent = re.compile(r'^(mercurial).*')
     accept = request.META.get('HTTP_ACCEPT',None)
-    result = agent.match(request.META.get('HTTP_USER_AGENT',None))
+    result = agent.match(request.META.get('HTTP_USER_AGENT',""))
 
     if result and accept.startswith('application/mercurial-'):
         return True
