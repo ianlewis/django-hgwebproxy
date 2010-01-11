@@ -21,12 +21,61 @@ from mercurial import hg, ui
 class RepositoryAdminForm(forms.ModelForm):
     class Meta:
         model = Repository
+
+    def clean_location(self):
+        """
+        Checks the repository location to make sure it exists and
+        is writable. 
+        """
+        location = self.cleaned_data["location"]
+
+        if not os.path.exists(os.path.join(location, '.hg')):
+            if not os.path.exists(location):
+                parent_dir = os.path.normpath(os.path.join(location, ".."))
+                if not os.path.exists(parent_dir):
+                    raise forms.ValidationError(_("This path does not exist."))
+                perm_check_path = parent_dir
+            else:
+                perm_check_path = location
+
+            if not os.access(perm_check_path, os.W_OK):
+                raise forms.ValidationError(_("You don't have sufficient permissions to create a repository at this path."))
+
+        return self.cleaned_data["location"]
     
     def clean_style(self):
+        """
+        Checks the style to see if a path is returned by
+        mercurial's templater. If no path is returned
+        then the style is assumed to be invalid or not installed.
+        """
         from mercurial.templater import templatepath
         if not templatepath(self.cleaned_data["style"]):
             raise forms.ValidationError(_("'%s' is not an available style." % self.cleaned_data["style"]))
         return self.cleaned_data["style"]
+
+    def clean(self):
+        """
+        Performs repository creation. This is done here
+        so that if any errors occur we can return to the
+        admin form.
+        """
+        cleaned_data = self.cleaned_data
+        location = self.cleaned_data.get("location")
+
+        # If we are creating the repository and it
+        # doesn't already exist on disk then create it.
+        if location and not os.path.exists(os.path.join(location, '.hg')):
+            try:
+                if not os.path.exists(location):
+                    os.mkdir(location)
+
+                from mercurial import commands,ui
+                commands.init(ui.ui(), location)
+            except (IOError, OSError), e:
+                raise forms.ValidationError(_("An error occurred creating the repository."))
+
+        return cleaned_data
 
 class RepositoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'owner']

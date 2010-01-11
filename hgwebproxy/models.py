@@ -8,7 +8,8 @@ class Repository(models.Model):
     slug = models.SlugField(unique=True,
         help_text='Would be the name of the repo. Do not use "-" inside the name')
     owner = models.ForeignKey(User)
-    location = models.CharField(max_length=200)
+    location = models.CharField(max_length=200,
+            help_text=_('The absolute path to the repository. If the repository does not exist it will be created.'))
     description = models.TextField(blank=True, null=True)
 
     allow_archive = models.CharField(max_length=100, blank=True, null=True,
