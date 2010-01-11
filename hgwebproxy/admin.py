@@ -6,8 +6,10 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.conf import settings
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
+from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from django.contrib import admin
+from django import forms
 
 from hgwebproxy.proxy import HgRequestWrapper
 from hgwebproxy.models import Repository
@@ -15,6 +17,16 @@ from hgwebproxy.settings import *
 
 from mercurial.hgweb import hgwebdir, hgweb
 from mercurial import hg, ui
+
+class RepositoryAdminForm(forms.ModelForm):
+    class Meta:
+        model = Repository
+    
+    def clean_style(self):
+        from mercurial.templater import templatepath
+        if not templatepath(self.cleaned_data["style"]):
+            raise forms.ValidationError(_("'%s' is not an available style." % self.cleaned_data["style"]))
+        return self.cleaned_data["style"]
 
 class RepositoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'owner']
@@ -33,7 +45,7 @@ class RepositoryAdmin(admin.ModelAdmin):
             'fields': ('style', 'allow_archive',),
         }),
     )
-    
+    form = RepositoryAdminForm
 
     def explore(self, request, id, *args):
         opts = self.model._meta

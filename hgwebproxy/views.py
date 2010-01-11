@@ -1,5 +1,5 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ImproperlyConfigured
 from django.shortcuts import redirect, render_to_response, get_object_or_404
 from django.utils.translation import ugettext as _
 from django.utils.encoding import smart_str 
@@ -119,6 +119,9 @@ def repo_list(request, pattern):
     start = url[-1] == '?' and '&' or '?'
     sessionvars = webutil.sessionvars(vars, start)
     
+    if not templater.templatepath(STYLE):
+        raise ImproperlyConfigured(_("'%s' is not an available style. Please check the HGPROXY_STYLE property in your settings.py" % STYLE))
+
     mapfile = templater.stylemap(STYLE)
     tmpl = templater.templater(mapfile,
                                defaults={"header": header,
@@ -218,7 +221,11 @@ def repo_detail(request, slug):
     hgserve.repo.ui.setconfig('web', 'contact', smart_str(repo.owner.get_full_name()))
     hgserve.repo.ui.setconfig('web', 'allow_archive', repo.allow_archive)
     # Set the style
-    hgserve.repo.ui.setconfig('web', 'style', repo.style or STYLE)
+    style = repo.style or STYLE
+    if not templater.templatepath(style):
+        raise ImproperlyConfigured(_("'%s' is not an available style. Please check the HGPROXY_STYLE property in your settings.py" % style))
+
+    hgserve.repo.ui.setconfig('web', 'style', style)
     hgserve.repo.ui.setconfig('web', 'baseurl', repo.get_absolute_url() )
     # Allow push to the current user
     hgserve.repo.ui.setconfig('web', 'allow_push', authed)
