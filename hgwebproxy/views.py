@@ -109,7 +109,7 @@ def repo_list(request, pattern):
             response.write(''.join([each for each in (common.staticfile(static, fname, req))]))
             return response
 
-    defaultstaticurl = url + 'static/'
+    defaultstaticurl = request.path + 'static/'
     staticurl = STATIC_URL or defaultstaticurl if not settings.DEBUG else defaultstaticurl 
 
     if TEMPLATE_PATHS is not None:
