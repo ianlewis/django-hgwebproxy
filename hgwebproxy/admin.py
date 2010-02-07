@@ -7,6 +7,7 @@ from django.conf import settings
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
+from django.utils.encoding import smart_str 
 from django.contrib.auth.models import User
 from django.contrib import admin
 from django import forms
@@ -125,13 +126,13 @@ class RepositoryAdmin(admin.ModelAdmin):
         # TODO: A more flexible way to get the default template path of mercurial
         hgserve.templatepath = (template_dir, '/usr/share/mercurial/templates')
 
-        hgserve.repo.ui.setconfig('web', 'description', repo.description)
-        hgserve.repo.ui.setconfig('web', 'name', hgserve.reponame)
+        hgserve.repo.ui.setconfig('web', 'description', smart_str(repo.description))
+        hgserve.repo.ui.setconfig('web', 'name', smart_str(hgserve.reponame))
         # encode('utf-8') FIX "decoding Unicode is not supported" exception on mercurial
-        hgserve.repo.ui.setconfig('web', 'contact', repo.owner.get_full_name().encode('utf-8') )
+        hgserve.repo.ui.setconfig('web', 'contact', smart_str(repo.owner.get_full_name()))
         hgserve.repo.ui.setconfig('web', 'allow_archive', repo.allow_archive)
         hgserve.repo.ui.setconfig('web', 'style', 'monoblue_plain')
-        hgserve.repo.ui.setconfig('web', 'baseurl', repo.get_admin_explore_url() )
+        hgserve.repo.ui.setconfig('web', 'baseurl', repo.get_admin_explore_url())
         hgserve.repo.ui.setconfig('web', 'staticurl', STATIC_URL)
 
         try:
