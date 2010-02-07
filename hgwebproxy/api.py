@@ -24,10 +24,10 @@ def create_repository(location):
     if re.match("[\w\d]+://", location):
         raise ValueError(_("Remote repository locations are not supported"))
 
-    if not os.path.isabs(location):
-        if not settings.REPO_ROOT:
-            raise ImproperlyConfigured(_("REPO_ROOT must be defined in your settings file if using a relative path."))
-        location = os.path.join(settings.REPO_ROOT, location)
+    #if not os.path.isabs(location):
+    #    if not settings.REPO_ROOT:
+    #        raise ImproperlyConfigured(_("REPO_ROOT must be defined in your settings file if using a relative path."))
+    #    location = os.path.join(settings.REPO_ROOT, location)
 
     if not os.path.isdir(os.path.join(location, ".hg")):
         if not os.path.exists(location):
