@@ -1,7 +1,8 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.core.exceptions import PermissionDenied, ImproperlyConfigured
 from django.shortcuts import redirect, render_to_response, get_object_or_404
 from django.utils.translation import ugettext as _
+from django.utils.http import urlquote
 from django.utils.encoding import smart_str 
 from django.conf import settings
 
@@ -177,7 +178,22 @@ def repo_detail(request, slug):
     realm = AUTH_REALM # Change if you want.
 
     if is_mercurial(request):
-        # This is a request by a mercurial user
+        # This is a request by a mercurial client 
+
+        # If slash not present then add slash regardless of APPEND_SLASH setting
+        # since hgweb returns 404 if it isn't present.
+        if not request.path.endswith('/'):
+            new_url = [request.get_host(), request.path+'/']
+            if new_url[0]:
+                newurl = "%s://%s%s" % (
+                    request.is_secure() and 'https' or 'http',
+                    new_url[0], urlquote(new_url[1]))
+            else:
+                newurl = urlquote(new_url[1])
+            if request.GET:
+                newurl += '?' + request.META['QUERY_STRING']
+            return HttpResponsePermanentRedirect(newurl)
+    
         authed = basic_auth(request, realm, repo)
     else:
         # This is a standard web request
