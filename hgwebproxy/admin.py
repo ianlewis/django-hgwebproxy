@@ -1,6 +1,7 @@
 __docformat__ = "restructedtext"
 
 import os
+import re
 
 from django.http import HttpResponseRedirect, HttpResponse
 from django.conf import settings
@@ -29,6 +30,9 @@ class RepositoryAdminForm(forms.ModelForm):
         is writable. 
         """
         location = self.cleaned_data["location"]
+
+        if re.match("[\w\d]+://", location):
+            raise forms.ValidationError(_("Remote repository locations are not supported"))
 
         if not os.path.exists(os.path.join(location, '.hg')):
             if not os.path.exists(location):

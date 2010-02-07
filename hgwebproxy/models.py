@@ -3,6 +3,8 @@ from django.db.models import permalink
 from django.contrib.auth.models import User, Group
 from django.utils.translation import ugettext_lazy as _
 
+from api import *
+
 class Repository(models.Model):
     name = models.CharField(max_length=140)
     slug = models.SlugField(unique=True,
@@ -60,6 +62,14 @@ class Repository(models.Model):
         return ('repo_list', (), {
             'pattern': self.slug + "/",
         })
+
+    def save(self, *args, **kwargs):
+        super(Repository, self).save(*args, **kwargs)
+        create_repository(self.location)
+
+    def delete(self, *args, **kwargs):
+        super(Repository, self).delete(*args, **kwargs)
+        delete_repository(self.location)
 
     class Meta:
         verbose_name = _('repository')
