@@ -5,6 +5,8 @@ import base64
 
 from django.core.urlresolvers import reverse
 
+from mercurial import util
+
 class HgRequestWrapper(object):
     """
     request wrapper. The main purpose of this class
@@ -116,3 +118,11 @@ class HgRequestWrapper(object):
             else:
                 thing = str(thing)
                 self._response.write(thing)
+
+    def drain(self):
+        '''
+        Need to read all data from request, httplib is half-duplex
+        '''
+        length = int(self.env.get('CONTENT_LENGTH', 0))
+        for s in util.filechunkiter(self.inp, limit=length):
+            pass
