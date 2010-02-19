@@ -128,6 +128,24 @@
         }
     }, 
     {
+        "pk": 7, 
+        "model": "auth.user", 
+        "fields": {
+            "username": "no_perms", 
+            "first_name": "no_perms", 
+            "last_name": "user", 
+            "is_active": true, 
+            "is_superuser": false, 
+            "is_staff": false, 
+            "last_login": "2009-12-21 05:38:53", 
+            "groups": [], 
+            "user_permissions": [], 
+            "password": "sha1$f2999$df2bfedd2fb850292335aa299407b2472eac6071", 
+            "email": "no_perms@example.com", 
+            "date_joined": "2009-12-21 05:38:53"
+        }
+    },
+    {
         "pk": 1, 
         "model": "hgwebproxy.repository", 
         "fields": {

@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from hgwebproxy.proxy import HgRequestWrapper
 from hgwebproxy.utils import is_mercurial, basic_auth
 from hgwebproxy.models import Repository
-from hgwebproxy.settings import *
+from hgwebproxy import settings as hgwebproxy_settings 
 
 from mercurial.hgweb import hgwebdir, hgweb, common, webutil
 from mercurial import ui, hg, util, templater
@@ -32,7 +32,7 @@ def repo_list(request, pattern):
     except Repository.DoesNotExist:
         pass
 
-    if REPO_LIST_REQUIRES_LOGIN and not request.user.is_authenticated():
+    if hgwebproxy_settings.REPO_LIST_REQUIRES_LOGIN and not request.user.is_authenticated():
         return redirect(settings.LOGIN_URL) 
 
     u = ui.ui()
@@ -111,19 +111,19 @@ def repo_list(request, pattern):
             return response
 
     defaultstaticurl = request.path + 'static/'
-    staticurl = STATIC_URL or defaultstaticurl if not settings.DEBUG else defaultstaticurl 
+    staticurl = hgwebproxy_settings.STATIC_URL or defaultstaticurl if not settings.DEBUG else defaultstaticurl 
 
-    if TEMPLATE_PATHS is not None:
-        hgserve.templatepath = TEMPLATE_PATHS 
+    if hgwebproxy_settings.TEMPLATE_PATHS is not None:
+        hgserve.templatepath = hgwebproxy_settings.TEMPLATE_PATHS 
 
     vars = {}
     start = url[-1] == '?' and '&' or '?'
     sessionvars = webutil.sessionvars(vars, start)
     
-    if not templater.templatepath(STYLE):
+    if not templater.templatepath(hgwebproxy_settings.STYLE):
         raise ImproperlyConfigured(_("'%s' is not an available style. Please check the HGPROXY_STYLE property in your settings.py" % STYLE))
 
-    mapfile = templater.stylemap(STYLE)
+    mapfile = templater.stylemap(hgwebproxy_settings.STYLE)
     tmpl = templater.templater(mapfile,
                                defaults={"header": header,
                                          "footer": footer,
@@ -175,7 +175,7 @@ def repo_detail(request, slug):
     can push.
     """
 
-    realm = AUTH_REALM # Change if you want.
+    realm = hgwebproxy_settings.AUTH_REALM # Change if you want.
 
     if is_mercurial(request):
         # This is a request by a mercurial client 
@@ -228,8 +228,8 @@ def repo_detail(request, slug):
 
     hgserve.reponame = repo.slug
 
-    if TEMPLATE_PATHS is not None:
-        hgserve.templatepath = TEMPLATE_PATHS 
+    if hgwebproxy_settings.TEMPLATE_PATHS is not None:
+        hgserve.templatepath = hgwebproxy_settings.TEMPLATE_PATHS 
 
     hgserve.repo.ui.setconfig('web', 'description', smart_str(repo.description))
     hgserve.repo.ui.setconfig('web', 'name', smart_str(hgserve.reponame))
@@ -248,7 +248,7 @@ def repo_detail(request, slug):
 
     #Allow serving static content from a seperate URL
     if not settings.DEBUG:
-        hgserve.repo.ui.setconfig('web', 'staticurl', STATIC_URL)
+        hgserve.repo.ui.setconfig('web', 'staticurl', hgwebproxy_settings.STATIC_URL)
 
     if settings.DEBUG:
         # Allow pushing in using http when debugging

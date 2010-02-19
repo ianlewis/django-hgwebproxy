@@ -14,9 +14,11 @@ def main():
 
     global_settings.INSTALLED_APPS = (
         'django.contrib.auth',
+        'django.contrib.sessions',
         'django.contrib.contenttypes',
         'hgwebproxy',
     )
+    global_settings.ROOT_URLCONF = 'hgwebproxy.urls'
     global_settings.DATABASE_ENGINE = "sqlite3"
     global_settings.DATABASE_NAME = ":memory:"
 
