@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase as DjangoTestCase
 from django.core.urlresolvers import reverse
 
-from models import Repository
+from hgwebproxy.models import Repository
 
 class PermissionTest(DjangoTestCase):
     fixtures = ['basic.json']

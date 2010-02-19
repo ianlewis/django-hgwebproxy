@@ -93,4 +93,5 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
     ],
+    test_suite='tests.main',
 )
