@@ -1,4 +1,3 @@
-==============================
 django-hgwebproxy
 ==============================
 
@@ -26,18 +25,16 @@ You can install the development version direcly from bitbucket as well::
 
 After installing you will need to perform the following steps.
 
-    1. Add 'hgwebproxy' to your INSTALLED_APPS
-    2. Add hgwebproxy urls to urls.py::
-
-.. code-block:: python
+* Add 'hgwebproxy' to your INSTALLED_APPS
+* Add hgwebproxy urls to urls.py
 
     urlpatterns = patterns('',
         (r'^hg/', include('hgwebproxy.urls')),
     )
 
-    3. Run syncdb::
-
-        python manage.py syncdb
+* Run syncdb
+  
+    python manage.py syncdb
 
 Testing
 -----------------------------
