@@ -26,13 +26,13 @@ You can install the development version direcly from bitbucket as well::
 After installing you will need to perform the following steps.
 
 * Add 'hgwebproxy' to your INSTALLED_APPS
-* Add hgwebproxy urls to urls.py
+* Add hgwebproxy urls to urls.py::
 
     urlpatterns = patterns('',
         (r'^hg/', include('hgwebproxy.urls')),
     )
 
-* Run syncdb
+* Run syncdb::
   
     python manage.py syncdb
 
