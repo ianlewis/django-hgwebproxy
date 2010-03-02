@@ -1,8 +1,8 @@
 # django-hgwebproxy Japanese translation file.
-# Copyright (C) 2010 Ian Lewis 
+# Copyright (C) 2010 Ian Lewis
 # This file is distributed under the same license as the django-hgwebproxy package.
 # Ian Lewis <IanMLewis@gmail.com>, 2010.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
@@ -17,76 +17,71 @@ msgstr ""
 
 #: admin.py:35 api.py:25
 msgid "Remote repository locations are not supported"
-msgstr ""
+msgstr "リモートリポジトリはサポートされていません。"
 
 #: admin.py:41
 msgid "This path does not exist."
-msgstr ""
+msgstr "このパスは存在しません。"
 
 #: admin.py:47
-msgid ""
-"You don't have sufficient permissions to create a repository at this path."
-msgstr ""
+msgid "You don't have sufficient permissions to create a repository at this path."
+msgstr "このパスにリポジトリを作成する権限がありません。"
 
 #: admin.py:59
 #, python-format
 msgid "'%s' is not an available style."
-msgstr ""
+msgstr "'％s'は使用できるスタイルではありません。"
 
 #: admin.py:81
 msgid "An error occurred creating the repository."
-msgstr ""
+msgstr "リポジトリを作成する時に、エラーが発生しました。"
 
 #: models.py:14
-msgid ""
-"The absolute path to the repository. If the repository does not exist it "
-"will be created."
-msgstr ""
+msgid "The absolute path to the repository. If the repository does not exist it will be created."
+msgstr "リポジトリへの絶対パスです。リポジトリが存在しない場合は、作成します。"
 
 #: models.py:18
 msgid "Same as in hgrc config, as: zip, bz2, gz"
-msgstr ""
+msgstr "hgrc設定ファイルと同じ形式です。例: zip, bz2, gz"
 
 #: models.py:21
 msgid "The hgweb style"
-msgstr ""
+msgstr "hgwebスタイル"
 
 #: models.py:75
 msgid "repository"
-msgstr ""
+msgstr "リポジトリ"
 
 #: models.py:76
 msgid "repositories"
-msgstr ""
+msgstr "リポジトリ"
 
 #: views.py:124 views.py:242
 #, python-format
-msgid ""
-"'%s' is not an available style. Please check the HGPROXY_STYLE property in "
-"your settings.py"
-msgstr ""
+msgid "'%s' is not an available style. Please check the HGPROXY_STYLE property in your settings.py"
+msgstr "'％s'は使用できるスタイルではありません。settings.pyのHGPROXY_STYLEプロパティを確認してください。"
 
 #: views.py:201
 msgid "You do not have access to this repository"
-msgstr ""
+msgstr "このリポジトリにアクセスする権限がありません。"
 
 #: templates/admin/hgwebproxy/repository/change_form.html:7
 #, python-format
 msgid "Explore %(name)s"
-msgstr ""
+msgstr "ブラウズ %(name)s"
 
 #: templates/admin/hgwebproxy/repository/change_form.html:8
 msgid "History"
-msgstr ""
+msgstr "履歴"
 
 #: templates/admin/hgwebproxy/repository/change_form.html:9
 msgid "View on site"
-msgstr ""
+msgstr "サイトで表示"
 
 #: templates/admin/hgwebproxy/repository/explore.html:9
 msgid "Home"
-msgstr ""
+msgstr "ホーム"
 
 #: templates/admin/hgwebproxy/repository/explore.html:13
 msgid "Explore"
-msgstr ""
+msgstr "ブラウズ"
