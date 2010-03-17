@@ -1,3 +1,5 @@
+import os
+
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.core.exceptions import PermissionDenied, ImproperlyConfigured
 from django.shortcuts import redirect, render_to_response, get_object_or_404
