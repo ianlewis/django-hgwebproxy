@@ -25,15 +25,8 @@ to `hgweb` and handles authentication on `POST` up against
 Djangos own built in authentication layer.
 """
 
-def repo_list(request, pattern):
+def repo_list(request):
     # Handle repo_detail
-    slug = pattern.split('/')[0]
-    try:
-        repo = Repository.objects.get(slug=slug)
-        return repo_detail(request, slug=slug)
-    except Repository.DoesNotExist:
-        pass
-
     if hgwebproxy_settings.REPO_LIST_REQUIRES_LOGIN and not request.user.is_authenticated():
         return redirect(settings.LOGIN_URL) 
 
@@ -99,19 +92,6 @@ def repo_list(request, pattern):
                 row['parity'] = parity.next()
                 yield row
 
-    if settings.DEBUG:
-        # Handle static files 
-        if pattern.startswith("static/"): 
-            static = templater.templatepath('static')
-            fname = pattern[7:]
-            req = HgRequestWrapper(
-                request,
-                response,
-                script_name=url,
-            )
-            response.write(''.join([each for each in (common.staticfile(static, fname, req))]))
-            return response
-
     defaultstaticurl = request.path + 'static/'
     staticurl = hgwebproxy_settings.STATIC_URL or defaultstaticurl if not settings.DEBUG else defaultstaticurl 
 
@@ -158,7 +138,8 @@ def repo_list(request, pattern):
         response.write(chunk)
     return response
 
-def repo_detail(request, slug):
+def repo_detail(request, pattern):
+    slug = pattern.split('/')[0]
     repo = get_object_or_404(Repository, slug=slug)
     response = HttpResponse()
     hgr = HgRequestWrapper(
@@ -259,4 +240,17 @@ def repo_detail(request, slug):
 
     # Allow hgweb errors to propagate
     response.write(''.join([each for each in hgserve.run_wsgi(hgr)]))
+    return response
+
+def static_file(request, file_name):
+    # Handle static files 
+    static = templater.templatepath('static')
+    response = HttpResponse()
+    url = request.path
+    req = HgRequestWrapper(
+        request,
+        response,
+        script_name=url,
+    )
+    response.write(''.join([each for each in (common.staticfile(static, file_name, req))]))
     return response

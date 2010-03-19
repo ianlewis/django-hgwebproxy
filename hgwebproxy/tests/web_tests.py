@@ -54,11 +54,14 @@ class RequestTestCase(DjangoTestCase):
         self.assertContains(response, "<body")
         self.assertContains(response, "</body>")
 
+    def assertHeader(self, response, header_name, value):
+        self.assertEquals(response[header_name], value)
+
 class HgWebTest(RequestTestCase):
     fixtures = ['basic.json']
 
     def test_hgwebdir_top(self):
-        response = self.client.get(reverse("repo_list", kwargs={"pattern":""}))
+        response = self.client.get(reverse("repo_list"))
         self.assertOk(response)
         self.assertHtml(response)
 
@@ -72,7 +75,7 @@ class HGWebDirPublicTest(RequestTestCase):
         hgwebproxy_settings.REPO_LIST_REQUIRES_LOGIN = False
 
     def test_public_repo_list(self):
-        response = self.client.get(reverse("repo_list", kwargs={"pattern":""}))
+        response = self.client.get(reverse("repo_list"))
         self.assertRedirect(response, "http://testserver%s" % settings.LOGIN_URL)
 
     # TODO: Initialize test repo. Make a mock mercurial repo?
@@ -82,3 +85,17 @@ class HGWebDirPublicTest(RequestTestCase):
     #    self.assertOk(response)
     #    self.assertHtml(response)
     #    self.assertContains(response, "test-repo")
+
+class DebugStaticFilesTest(RequestTestCase):
+
+    def setUp(self):
+        self.old_debug = settings.DEBUG
+        settings.DEBUG = True
+
+    def tearDown(self):
+        settings.DEBUG = self.old_debug
+
+    def test_static_file(self):
+        response = self.client.get(reverse("repo_static_file", kwargs={"file_name":"hglogo.png"}))
+        self.assertOk(response)
+        self.assertHeader(response, "Content-Type", "image/png")
