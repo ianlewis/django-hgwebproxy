@@ -100,7 +100,7 @@ def repo_list(request):
     sessionvars = webutil.sessionvars(vars, start)
     
     if not templater.templatepath(hgwebproxy_settings.STYLE):
-        raise ImproperlyConfigured(_("'%s' is not an available style. Please check the HGPROXY_STYLE property in your settings.py" % STYLE))
+        raise ImproperlyConfigured(_("'%s' is not an available style. Please check the HGPROXY_STYLE property in your settings.py" % hgwebproxy_settings.STYLE))
 
     mapfile = templater.stylemap(hgwebproxy_settings.STYLE)
     tmpl = templater.templater(mapfile,
@@ -217,7 +217,7 @@ def repo_detail(request, pattern):
     hgserve.repo.ui.setconfig('web', 'contact', smart_str(repo.owner.get_full_name()))
     hgserve.repo.ui.setconfig('web', 'allow_archive', repo.allow_archive)
     # Set the style
-    style = repo.style or STYLE
+    style = repo.style or hgwebproxy_settings.STYLE
     if not templater.templatepath(style):
         raise ImproperlyConfigured(_("'%s' is not an available style. Please check the HGPROXY_STYLE property in your settings.py" % style))
 
