@@ -8,6 +8,4 @@ AUTH_REALM = getattr(settings, 'HGPROXY_AUTH_RELAM', 'Basic Auth')
 
 STYLE = getattr(settings, 'HGPROXY_STYLE', 'coal')
 
-REPO_LIST_REQUIRES_LOGIN = getattr(settings, 'HGPROXY_REPO_LIST_REQUIRES_LOGIN', False)
-
 REPO_PERMANENT_DELETE = getattr(settings, 'HGPROXY_REPO_PERMANENT_DELETE', False)

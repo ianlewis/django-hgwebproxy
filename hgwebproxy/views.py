@@ -27,9 +27,6 @@ Djangos own built in authentication layer.
 
 def repo_list(request):
     # Handle repo_detail
-    if hgwebproxy_settings.REPO_LIST_REQUIRES_LOGIN and not request.user.is_authenticated():
-        return redirect(settings.LOGIN_URL) 
-
     u = ui.ui()
     u.setconfig('ui', 'report_untrusted', 'off')
     u.setconfig('ui', 'interactive', 'off')

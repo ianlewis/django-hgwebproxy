@@ -65,27 +65,6 @@ class HgWebTest(RequestTestCase):
         self.assertOk(response)
         self.assertHtml(response)
 
-class HGWebDirPublicTest(RequestTestCase):
-    fixtures = ['basic.json']
-
-    def setUp(self):
-        hgwebproxy_settings.REPO_LIST_REQUIRES_LOGIN = True
-
-    def tearDown(self):
-        hgwebproxy_settings.REPO_LIST_REQUIRES_LOGIN = False
-
-    def test_public_repo_list(self):
-        response = self.client.get(reverse("repo_list"))
-        self.assertRedirect(response, "http://testserver%s" % settings.LOGIN_URL)
-
-    # TODO: Initialize test repo. Make a mock mercurial repo?
-    #def test_reader_repo_list(self):
-    #    self.client.login(username="reader", password="reader")
-    #    response = self.client.get(reverse("repo_list", kwargs={"pattern":""}))
-    #    self.assertOk(response)
-    #    self.assertHtml(response)
-    #    self.assertContains(response, "test-repo")
-
 class DebugStaticFilesTest(RequestTestCase):
 
     def setUp(self):
