@@ -71,7 +71,6 @@ setup(
     name='django-hgwebproxy',
     version='0.2.0',
     description='Django-hgwebproxy is an app to use and manage mercurial repositories within the django admin interface',
-    long_description=open('README').read(),
     author='Mario C&Atilde;&copy;sar Se&Atilde;&plusmn;oranis Ayala',
     author_email='mariocesar.sa@openit.com.bo',
     url='http://bitbucket.org/mariocesar/django-hgweproxy/',
