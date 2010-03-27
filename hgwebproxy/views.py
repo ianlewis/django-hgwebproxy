@@ -230,9 +230,8 @@ def repo_detail(request, pattern):
     if not settings.DEBUG:
         hgserve.repo.ui.setconfig('web', 'staticurl', hgwebproxy_settings.STATIC_URL)
 
-    if settings.DEBUG:
+    if settings.DEBUG or hgwebproxy_settings.ALLOW_HTTP_PUSH:
         # Allow pushing in using http when debugging
-        # TODO: Add a setting for push_ssl
         hgserve.repo.ui.setconfig('web', 'push_ssl', 'false')
 
     # Allow hgweb errors to propagate

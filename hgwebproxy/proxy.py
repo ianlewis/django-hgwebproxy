@@ -3,9 +3,19 @@ import re
 import cgi
 import base64
 
+from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 
 from mercurial import util
+from mercurial.hgweb.common import ErrorResponse
+
+def apply_error_response(django_response, error_resp):
+    django_response.status_code = error_resp.code
+    #django_response._headers = {}
+    for header in error_resp.headers:
+        django_response[header] = error_resp.headers[header]
+    django_response.write(error_resp.message)
+    return django_response
 
 class HgRequestWrapper(object):
     """
@@ -86,17 +96,22 @@ class HgRequestWrapper(object):
         # hgweb sometimes calls respond multiple times which 
         # would cause incorrect headers to get set.
         if not self._responded:
-            self._response.status_code = code
+            if isinstance(code, ErrorResponse):
+                # When mercurial throws an ssl_required error
+                # it passes ErrorResponse for some reason.:
+                apply_error_response(self._response, code)
+            else:
+                self._response.status_code = code
 
-            self._response['content-type'] = content_type
-
-            if path is not None and length is not None:
                 self._response['content-type'] = content_type
-                self._response['content-length'] = length
-                self._response['content-disposition'] = 'inline; filename=%s' % path
 
-            for directive, value in self.headers:
-                self._response[directive.lower()] = value
+                if path is not None and length is not None:
+                    self._response['content-type'] = content_type
+                    self._response['content-length'] = length
+                    self._response['content-disposition'] = 'inline; filename=%s' % path
+
+                for directive, value in self.headers:
+                    self._response[directive.lower()] = value
 
             self._responded = True
 
