@@ -103,6 +103,8 @@ def repo_list(request):
         raise ImproperlyConfigured(_("'%s' is not an available style. Please check the HGPROXY_STYLE property in your settings.py" % hgwebproxy_settings.STYLE))
 
     mapfile = templater.stylemap(hgwebproxy_settings.STYLE)
+    if isinstance(mapfile, tuple):
+        mapfile = mapfile[1]
     tmpl = templater.templater(mapfile,
                                defaults={"header": header,
                                          "footer": footer,
