@@ -7,7 +7,17 @@ syntax: glob
 *.o
 *.pyc
 *.swp
-django_hgwebproxy.egg-info
+build
+dist
+site_media
+*-log.txt
+*.egg-info
+download*
+tests/.installed.cfg
+tests/bin
+tests/develop-eggs
+tests/eggs
+tests/parts
 example/database.sqlite
 
 syntax: regexp
