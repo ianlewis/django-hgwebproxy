@@ -58,28 +58,27 @@ def repo_list(request):
     def entries(sortcolumn="", descending=False, subdir="", **map):
         rows = []
         parity = common.paritygen(stripecount)
-        for repo in Repository.objects.all():
-            if repo.can_browse(request.user): 
-                contact = smart_str(repo.owner.get_full_name())
+        for repo in Repository.objects.has_view_permission(request.user):
+            contact = smart_str(repo.owner.get_full_name())
 
-                lastchange = (common.get_mtime(repo.location), util.makedate()[1])
-                 
-                row = dict(contact=contact or "unknown",
-                           contact_sort=contact.upper() or "unknown",
-                           name=smart_str(repo.name),
-                           name_sort=smart_str(repo.name),
-                           url=repo.get_absolute_url(),
-                           description=smart_str(repo.description) or "unknown",
-                           description_sort=smart_str(repo.description.upper()) or "unknown",
-                           lastchange=lastchange,
-                           lastchange_sort=lastchange[1]-lastchange[0],
-                           archives=archivelist(u, "tip", url))
-                if (not sortcolumn or (sortcolumn, descending) == sortdefault):
-                    # fast path for unsorted output
-                    row['parity'] = parity.next()
-                    yield row
-                else:
-                    rows.append((row["%s_sort" % sortcolumn], row))
+            lastchange = (common.get_mtime(repo.location), util.makedate()[1])
+             
+            row = dict(contact=contact or "unknown",
+                       contact_sort=contact.upper() or "unknown",
+                       name=smart_str(repo.name),
+                       name_sort=smart_str(repo.name),
+                       url=repo.get_absolute_url(),
+                       description=smart_str(repo.description) or "unknown",
+                       description_sort=smart_str(repo.description.upper()) or "unknown",
+                       lastchange=lastchange,
+                       lastchange_sort=lastchange[1]-lastchange[0],
+                       archives=archivelist(u, "tip", url))
+            if (not sortcolumn or (sortcolumn, descending) == sortdefault):
+                # fast path for unsorted output
+                row['parity'] = parity.next()
+                yield row
+            else:
+                rows.append((row["%s_sort" % sortcolumn], row))
 
         if rows:
             rows.sort()
@@ -179,7 +178,7 @@ def repo_detail(request, pattern):
         authed = basic_auth(request, realm, repo)
     else:
         # This is a standard web request
-        if not repo.can_browse(request.user):
+        if not repo.has_view_permission(request.user):
             raise PermissionDenied(_("You do not have access to this repository"))
         authed = request.user.username
 

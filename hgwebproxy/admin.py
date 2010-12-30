@@ -5,11 +5,12 @@ import re
 
 from django.http import HttpResponseRedirect, HttpResponse
 from django.conf import settings
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import redirect, render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 from django.utils.encoding import smart_str 
 from django.contrib.auth.models import User
+from django.contrib.admin.util import unquote
 from django.contrib import admin
 from django import forms
 
@@ -83,20 +84,30 @@ class RepositoryAdminForm(forms.ModelForm):
         return cleaned_data
 
 class RepositoryAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ['name', 'owner']
     prepopulated_fields = {
         'slug': ('name',)
     }
-    filter_horizontal = ('readers','reader_groups','writers','writer_groups')
+    filter_horizontal = (
+        'readers','reader_groups',
+        'writers','writer_groups',
+        'admins', 'admin_groups',
+    )
     fieldsets = (
         (None, {
             'fields': ('name', 'slug', 'owner', 'location', 'description')
         }),
         ('Permissions', {
-            'fields': ('readers', 'writers', 'reader_groups', 'writer_groups')
+            'fields': (
+                'readers', 'writers', 'admins',
+                'reader_groups', 'writer_groups', 'admin_groups',
+            ),
+            'classes': ('collapse',)
         }),
         ('Options', {
             'fields': ('style', 'allow_archive',),
+            'classes': ('collapse',)
         }),
     )
     form = RepositoryAdminForm
@@ -173,6 +184,36 @@ class RepositoryAdmin(admin.ModelAdmin):
         of custom layout you want around it.
         """
         return render_to_response("admin/hgwebproxy/repository/explore.html", context, RequestContext(request))
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if not request.user.is_superuser:
+            if db_field.name == "owner":
+                queryset = kwargs.get('queryset', User.objects.all())
+                kwargs["queryset"] = queryset.filter(pk=request.user.pk)
+        return super(RepositoryAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def change_view(self, request, object_id, extra_context=None):
+        obj = self.get_object(request, unquote(object_id))
+        if (obj.has_view_permission(request.user) and not
+                obj.has_change_permission(request.user)):
+            return redirect(obj)
+        else:
+            return super(RepositoryAdmin, self).change_view(request, object_id, extra_context)
+
+    def queryset(self, request):
+        return Repository.objects.has_view_permission(request.user)
+    
+    def has_change_permission(self, request, obj=None):
+        has_perm = super(RepositoryAdmin, self).has_change_permission(request, obj)
+        if obj:
+            has_perm = has_perm and obj.has_change_permission(request.user)
+        return has_perm
+
+    def has_delete_permission(self, request, obj=None):
+        has_perm = super(RepositoryAdmin, self).has_delete_permission(request, obj)
+        if obj:
+            has_perm = has_perm and obj.has_delete_permission(request.user)
+        return has_perm
 
     def get_urls(self):
         from django.conf.urls.defaults import patterns, url 

@@ -1,9 +1,82 @@
 from django.db import models
-from django.db.models import permalink
+from django.db.models import permalink, Q
 from django.contrib.auth.models import User, Group
 from django.utils.translation import ugettext_lazy as _
 
 from api import *
+
+class RepositoryManager(models.Manager):
+    def has_view_permission(self, user):
+        if not self._has_model_perm(user, 'view'):
+            return self.none()
+        else:
+            return self._readable(user)
+
+    def has_pull_permission(self, user):
+        if not self._has_model_perm(user, 'pull'):
+            return self.none()
+        else:
+            return self._readable(user)
+
+    def has_push_permission(self, user):
+        if not self._has_model_perm(user, 'push'):
+            return self.none()
+        else:
+            return self._writable(user)
+
+    def has_change_permission(self, user):
+        if not self._has_model_perm(user, 'change'):
+            return self.none()
+        else:
+            return self._admin(user)
+
+    def has_delete_permission(self, user):
+        if not self._has_model_perm(user, 'delete'):
+            return self.none()
+        else:
+            return self._admin(user)
+
+    def _has_model_perm(self, user, perm):
+        opts = Repository._meta
+        # Special case for custom permissions.
+        if perm in ('view', 'push', 'pull'):
+            perm_name = '%s_repository' % perm
+        else:
+            perm_name = getattr(opts, 'get_%s_permission' % perm, lambda: False)()
+        return user.has_perm(opts.app_label + '.' + perm_name)
+
+    def _readable(self, user):
+        if user.is_superuser:
+            return self.all()
+        return self.filter(
+            Q(owner = user) | 
+            Q(readers = user) |
+            Q(writers = user) |
+            Q(admins = user) |
+            Q(reader_groups__in=user.groups.all()) |
+            Q(writer_groups__in=user.groups.all()) |
+            Q(admin_groups__in=user.groups.all())
+        )
+
+    def _writable(self, user): 
+        if user.is_superuser:
+            return self.all()
+        return self.filter(
+            Q(owner = user) | 
+            Q(writers = user) |
+            Q(admins = user) |
+            Q(writer_groups__in=user.groups.all()) |
+            Q(admin_groups__in=user.groups.all())
+        )
+
+    def _admin(self, user):
+        if user.is_superuser:
+            return self.all()
+        return self.filter(
+            Q(owner = user) | 
+            Q(admins = user) |
+            Q(admin_groups__in=user.groups.all())
+        )
 
 class Repository(models.Model):
     name = models.CharField(max_length=140)
@@ -22,34 +95,57 @@ class Repository(models.Model):
 
     readers = models.ManyToManyField(User, related_name="repository_readable_set", blank=True, null=True)
     writers = models.ManyToManyField(User, related_name="repository_writeable_set", blank=True, null=True)
+    admins = models.ManyToManyField(User, related_name="repository_admin_set", blank=True, null=True)
     reader_groups = models.ManyToManyField(Group, related_name="repository_readable_set", blank=True, null=True)
     writer_groups = models.ManyToManyField(Group, related_name="repository_writeable_set", blank=True, null=True)
+    admin_groups = models.ManyToManyField(Group, related_name="repository_admin_set", blank=True, null=True)
+
+    objects = RepositoryManager()
 
     def __unicode__(self):
         return u'%s' % self.name
 
-    def can_browse(self, user):
-        return user.is_superuser or \
-               user == self.owner or \
-               not not self.readers.filter(pk=user.id) or \
-               not not self.writers.filter(pk=user.id) or \
-               not not self.reader_groups.filter(pk__in=[group.id for group in user.groups.all()]) or \
-               not not self.writer_groups.filter(pk__in=[group.id for group in user.groups.all()])
+    def _is_reader(self, user):
+        return (
+            self.readers.filter(pk=user.pk).exists() or
+            self.reader_groups.filter(
+                pk__in=map(lambda g: g.pk, user.groups.all())).exists()
+        )
 
+    def _is_writer(self, user):
+        return (
+            self.writers.filter(pk=user.pk).exists() or
+            self.writer_groups.filter(
+                pk__in=map(lambda g: g.pk, user.groups.all())).exists()
+        )
 
-    def can_pull(self, user):
-        return user.is_superuser or \
-               user == self.owner or \
-               not not self.readers.filter(pk=user.id) or \
-               not not self.writers.filter(pk=user.id) or \
-               not not self.reader_groups.filter(pk__in=[group.id for group in user.groups.all()]) or \
-               not not self.writer_groups.filter(pk__in=[group.id for group in user.groups.all()])
+    def _is_admin(self, user):
+        return (
+            user.is_superuser or
+            user.pk == self.owner_id or
+            self.admins.filter(pk=user.pk).exists() or
+            self.admin_groups.filter(
+                pk__in=map(lambda g: g.pk, user.groups.all())).exists()
+        )
+    has_change_permission = _is_admin
+    has_delete_permission = _is_admin
 
-    def can_push(self, user):
-        return user.is_superuser or \
-               user == self.owner or \
-               not not self.writers.filter(pk=user.id) or \
-               not not self.writer_groups.filter(pk__in=[group.id for group in user.groups.all()])
+    def has_view_permission(self, user):
+        return (
+            self._is_reader(user) or
+            self._is_writer(user) or
+            self._is_admin(user)
+        )
+    can_browse = has_view_permission
+    has_pull_permission = has_view_permission
+    can_pull = has_pull_permission
+    
+    def has_push_permission(self, user):
+        return (
+            self._is_writer(user) or
+            self._is_admin(user)
+        )
+    can_push = has_push_permission
 
     @permalink
     def get_admin_explore_url(self):
@@ -75,3 +171,8 @@ class Repository(models.Model):
         verbose_name = _('repository')
         verbose_name_plural = _('repositories')
         ordering = ['name',]
+        permissions = (
+            ("view_repository", "Can view repository"),
+            ("push_repository", "Can push to repository"),
+            ("pull_repository", "Can pull from repository"),
+        )
