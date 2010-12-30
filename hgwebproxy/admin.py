@@ -85,7 +85,8 @@ class RepositoryAdminForm(forms.ModelForm):
 
 class RepositoryAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ['name', 'owner']
+    list_display = ['name', 'owner', 'description']
+    list_filter = ('owner',)
     prepopulated_fields = {
         'slug': ('name',)
     }
