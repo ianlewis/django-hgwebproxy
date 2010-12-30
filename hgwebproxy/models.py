@@ -18,7 +18,7 @@ class Repository(models.Model):
         help_text=_("Same as in hgrc config, as: zip, bz2, gz"))
 
     style = models.CharField(max_length=256, blank=True, null=True,
-        default="coal", help_text=_('The hgweb style'))
+                             help_text=_('The hgweb style'))
 
     readers = models.ManyToManyField(User, related_name="repository_readable_set", blank=True, null=True)
     writers = models.ManyToManyField(User, related_name="repository_writeable_set", blank=True, null=True)
