@@ -78,6 +78,9 @@ class RepositoryManager(models.Manager):
             Q(admin_groups__in=user.groups.all())
         )
 
+def _qs_exists(qs):
+    return not not qs.values("pk")[:1]
+
 class Repository(models.Model):
     name = models.CharField(max_length=140)
     slug = models.SlugField(unique=True,
@@ -107,25 +110,25 @@ class Repository(models.Model):
 
     def _is_reader(self, user):
         return (
-            self.readers.filter(pk=user.pk).exists() or
-            self.reader_groups.filter(
-                pk__in=map(lambda g: g.pk, user.groups.all())).exists()
+            _qs_exists(self.readers.filter(pk=user.pk)) or
+            _qs_exists(self.reader_groups.filter(
+                pk__in=map(lambda g: g.pk, user.groups.all())))
         )
 
     def _is_writer(self, user):
         return (
-            self.writers.filter(pk=user.pk).exists() or
-            self.writer_groups.filter(
-                pk__in=map(lambda g: g.pk, user.groups.all())).exists()
+            _qs_exists(self.writers.filter(pk=user.pk)) or
+            _qs_exists(self.writer_groups.filter(
+                pk__in=map(lambda g: g.pk, user.groups.all())))
         )
 
     def _is_admin(self, user):
         return (
             user.is_superuser or
             user.pk == self.owner_id or
-            self.admins.filter(pk=user.pk).exists() or
-            self.admin_groups.filter(
-                pk__in=map(lambda g: g.pk, user.groups.all())).exists()
+            _qs_exists(self.admins.filter(pk=user.pk)) or
+            _qs_exists(self.admin_groups.filter(
+                pk__in=map(lambda g: g.pk, user.groups.all())))
         )
     has_change_permission = _is_admin
     has_delete_permission = _is_admin
