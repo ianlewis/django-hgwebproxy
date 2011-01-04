@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.signals import post_save, post_delete
 from django.db.models import permalink, Q
 from django.contrib.auth.models import User, Group
 from django.utils.translation import ugettext_lazy as _
@@ -162,14 +163,6 @@ class Repository(models.Model):
             'pattern': self.slug + "/",
         })
 
-    def save(self, *args, **kwargs):
-        super(Repository, self).save(*args, **kwargs)
-        create_repository(self.location)
-
-    def delete(self, *args, **kwargs):
-        super(Repository, self).delete(*args, **kwargs)
-        delete_repository(self.location)
-
     class Meta:
         verbose_name = _('repository')
         verbose_name_plural = _('repositories')
@@ -179,3 +172,11 @@ class Repository(models.Model):
             ("push_repository", "Can push to repository"),
             ("pull_repository", "Can pull from repository"),
         )
+
+def _repo_post_save(sender, instance, **kwargs):
+    create_repository(instance.location)
+post_save.connect(_repo_post_save, sender=Repository)
+
+def _repo_post_delete(sender, instance, **kwargs):
+    delete_repository(instance.location)
+post_delete.connect(_repo_post_delete, sender=Repository)
