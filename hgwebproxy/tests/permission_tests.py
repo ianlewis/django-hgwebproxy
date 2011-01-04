@@ -4,9 +4,10 @@ from django.contrib.auth.models import User
 from django.test import TestCase as DjangoTestCase
 from django.core.urlresolvers import reverse
 
+from hgwebproxy.tests.base import RepoTestCase
 from hgwebproxy.models import Repository
 
-class PermissionTest(DjangoTestCase):
+class PermissionTest(RepoTestCase):
     fixtures = ['basic.json']
 
     def assertReader(self, repo, user):

@@ -11,3 +11,7 @@ STYLE = getattr(settings, 'HGPROXY_STYLE', 'coal')
 REPO_PERMANENT_DELETE = getattr(settings, 'HGPROXY_REPO_PERMANENT_DELETE', False)
 
 ALLOW_HTTP_PUSH = getattr(settings, 'HGPROXY_ALLOW_HTTP_PUSH', False)
+
+
+REPO_ROOT = getattr(settings, 'HGPROXY_REPO_ROOT', os.path.join(settings.MEDIA_ROOT, 'hg/'))
+TEST_REPO_ROOT = getattr(settings, 'HGPROXY_TEST_REPO_ROOT', REPO_ROOT)

@@ -12,6 +12,8 @@ for DJANGO_VER in $DJANGO_VERSIONS
 do
     for HG_VER in $HG_VERSIONS
     do
-        ./bin/test-django-$DJANGO_VER-hg-$HG_VER
+        TESTSCRIPT=./bin/test-django-$DJANGO_VER-hg-$HG_VER
+        echo $TESTSCRIPT
+        $TESTSCRIPT
     done
 done

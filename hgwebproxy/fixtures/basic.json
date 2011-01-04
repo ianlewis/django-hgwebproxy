@@ -144,29 +144,5 @@
             "email": "no_perms@example.com", 
             "date_joined": "2009-12-21 05:38:53"
         }
-    },
-    {
-        "pk": 1, 
-        "model": "hgwebproxy.repository", 
-        "fields": {
-            "description": "Test Repository", 
-            "readers": [
-                2
-            ], 
-            "reader_groups": [
-                1
-            ], 
-            "writers": [
-                4
-            ], 
-            "location": "/path/to/repository", 
-            "owner": 3, 
-            "writer_groups": [
-                2
-            ], 
-            "slug": "test-repo", 
-            "allow_archive": "zip, bz2, gz", 
-            "name": "test-repo"
-        }
     }
 ]

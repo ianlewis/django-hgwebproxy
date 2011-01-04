@@ -109,21 +109,21 @@ class Repository(models.Model):
         return u'%s' % self.name
 
     def _is_reader(self, user):
-        return (
+        return not user.is_anonymous() and (
             _qs_exists(self.readers.filter(pk=user.pk)) or
             _qs_exists(self.reader_groups.filter(
                 pk__in=map(lambda g: g.pk, user.groups.all())))
         )
 
     def _is_writer(self, user):
-        return (
+        return not user.is_anonymous() and (
             _qs_exists(self.writers.filter(pk=user.pk)) or
             _qs_exists(self.writer_groups.filter(
                 pk__in=map(lambda g: g.pk, user.groups.all())))
         )
 
     def _is_admin(self, user):
-        return (
+        return not user.is_anonymous() and (
             user.is_superuser or
             user.pk == self.owner_id or
             _qs_exists(self.admins.filter(pk=user.pk)) or
