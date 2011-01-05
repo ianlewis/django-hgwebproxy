@@ -1,10 +1,11 @@
 from django.db import models
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import pre_save, post_save, post_delete
 from django.db.models import permalink, Q
 from django.contrib.auth.models import User, Group
 from django.utils.translation import ugettext_lazy as _
 
-from api import *
+from hgwebproxy.api import *
+from hgwebproxy import settings as hgwebproxy_settings
 
 class RepositoryManager(models.Manager):
     def has_view_permission(self, user):
@@ -172,6 +173,18 @@ class Repository(models.Model):
             ("push_repository", "Can push to repository"),
             ("pull_repository", "Can pull from repository"),
         )
+
+def _repo_pre_save(sender, instance, **kwargs):
+    # Set the location of the repository if REPO_ROOT is set.
+    # If REPO_ROOT is not set, location should be set manually
+    # so in that case let the db backend throw and error.
+    if not instance.location and hgwebproxy_settings.REPO_ROOT is not None:
+        from django.utils._os import safe_join
+        instance.location = safe_join(
+            hgwebproxy_settings.REPO_ROOT,
+            hgwebproxy_settings.REPO_PATH_CALLBACK(instance)
+        )
+pre_save.connect(_repo_pre_save, sender=Repository)
 
 def _repo_post_save(sender, instance, **kwargs):
     create_repository(instance.location)
