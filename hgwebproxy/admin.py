@@ -156,8 +156,8 @@ class RepositoryAdmin(admin.ModelAdmin):
         # Redirect the user to the public repository view if
         # The user does not have permission to change the repository.
         obj = self.get_object(request, unquote(object_id))
-        if (obj.has_view_permission(request.user) and not
-                obj.has_change_permission(request.user)):
+        if (self.has_view_permission(request.user, obj) and not
+                self.has_change_permission(request.user, obj)):
             return redirect(obj)
         else:
             return super(RepositoryAdmin, self).change_view(request, object_id, extra_context)
@@ -173,6 +173,14 @@ class RepositoryAdmin(admin.ModelAdmin):
         if not obj.owner:
             obj.owner = request.user
         obj.save()
+
+    def has_view_permission(self, request, obj=None):
+        opts = self.opts
+        perm_name = 'view_repository'
+        has_perm = request.user.has_perm(opts.app_label + '.' + perm_name)
+        if obj:
+            has_perm = has_perm and obj.has_view_permission(request.user)
+        return has_perm 
     
     def has_change_permission(self, request, obj=None):
         has_perm = super(RepositoryAdmin, self).has_change_permission(request, obj)
@@ -192,6 +200,9 @@ class RepositoryAdmin(admin.ModelAdmin):
 
         response = HttpResponse()
         repo = get_object_or_404(Repository, pk=id)
+        if not self.has_view_permission(request, repo):
+            raise PermissionDenied
+
         hgr = HgRequestWrapper(
             request,
             response,
